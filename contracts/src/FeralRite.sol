@@ -69,7 +69,7 @@ contract FeralRite is Ownable {
      * @dev 构造函数
      * @param _platformAddress 平台管理地址
      */
-    constructor(address _platformAddress) Ownable(msg.sender) {
+    constructor(address _platformAddress) Ownable() {
         require(_platformAddress != address(0), "Invalid platform address");
         platformAddress = _platformAddress;
     }
