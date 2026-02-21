@@ -1,0 +1,35 @@
+# FeralLobster Bot Runtime 依赖
+# Python 3.11+
+# ⚠️ All blockchain operations use Base Sepolia Testnet
+
+# Web 框架
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# 区块链
+web3>=6.15.0
+eth-account>=0.11.0
+
+# Arweave 存储
+arweave-python-client>=1.0.0
+
+# HTTP 客户端
+aiohttp>=3.9.0
+httpx>=0.26.0
+
+# 任务调度
+apscheduler>=3.10.0
+
+# 数据库 (SQLite)
+sqlalchemy>=2.0.0
+
+# 工具
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.0.0
+
+# 日志
+structlog>=24.1.0
+
+# 工具库
+python-dateutil>=2.8.0
