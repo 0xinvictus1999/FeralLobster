@@ -63,7 +63,7 @@ contract FeralRiteTest is Test {
     // 部署测试
     // ============================================
     
-    function test_Deployment() public view {
+    function test_Deployment() public {
         assertEq(feralRite.owner(), owner, "Owner should be set correctly");
         assertEq(feralRite.platformAddress(), platform, "Platform should be set correctly");
         assertEq(feralRite.usdcAddress(), USDC_ADDRESS, "USDC address should be Base Sepolia USDC");
@@ -258,7 +258,7 @@ contract FeralRiteTest is Test {
         feralRite.getSoulByWallet(stranger);
     }
 
-    function test_GetUSDC() public view {
+    function test_GetUSDC() public {
         IERC20 usdc = feralRite.getUSDC();
         assertEq(address(usdc), USDC_ADDRESS);
     }
@@ -288,7 +288,7 @@ contract FeralRiteTest is Test {
     // Fork 状态测试
     // ============================================
     
-    function test_BaseSepoliaForkActive() public view {
+    function test_BaseSepoliaForkActive() public {
         // 验证我们在正确的链上
         assertEq(block.chainid, 84532, "Should be on Base Sepolia (84532)");
         
