@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 248, 250, 252;
+  --background-start-rgb: 2, 6, 23;
+  --background-end-rgb: 15, 23, 42;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  min-height: 100vh;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* 科幻感文字效果 */
+.cyber-text {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
+
+.glow-border {
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+/* 步骤条动画 */
+.step-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.step-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease-out;
+}
+
+/* 长按按钮效果 */
+.hold-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.hold-button::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #ff0044, #ff3366);
+  transition: width 3s linear;
+}
