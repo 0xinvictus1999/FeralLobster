@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Orchestrator API
+  orchestrator:
+    build: ./orchestrator
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./orchestrator/.env
+    volumes:
+      - ./orchestrator/data:/app/data
+    networks:
+      - feral-network
+
+  # Telegram Bot
+  bot:
+    build: ./bot
+    env_file:
+      - ./bot/.env
+    depends_on:
+      - orchestrator
+    networks:
+      - feral-network
+
+  # Web Frontend (开发模式)
+  web:
+    build: ./web
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./web/.env.local
+    depends_on:
+      - orchestrator
+    networks:
+      - feral-network
+
+networks:
+  feral-network:
+    driver: bridge
