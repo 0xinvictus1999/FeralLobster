@@ -20,7 +20,7 @@ import { ExportedMemory, MemoryExportConfig } from '../../types';
 const execAsync = promisify(exec);
 
 /**
- * Memory export class for preparing AI agent memories for feral deployment
+ * Memory export class for preparing AI agent memories for axo deployment
  */
 export class MemoryExport {
   private config: MemoryExportConfig;
@@ -52,7 +52,7 @@ export class MemoryExport {
    */
   async exportMemory(): Promise<ExportedMemory> {
     // Check for existing export (double-spend protection)
-    const exportMarker = join(this.config.memoryDir, '.FERAL_EXPORTED');
+    const exportMarker = join(this.config.memoryDir, '.AXO_EXPORTED');
     try {
       await fs.access(exportMarker);
       throw new Error(
@@ -125,7 +125,7 @@ export class MemoryExport {
     const resolvedOutput = resolve(outputFile);
 
     // Exclude .git, node_modules, and export markers
-    const command = `tar -czf "${resolvedOutput}" -C "${resolvedSource}" --exclude='.git' --exclude='node_modules' --exclude='.FERAL_EXPORTED' .`;
+    const command = `tar -czf "${resolvedOutput}" -C "${resolvedSource}" --exclude='.git' --exclude='node_modules' --exclude='.AXO_EXPORTED' .`;
 
     try {
       await execAsync(command);

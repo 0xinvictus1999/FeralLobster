@@ -1,14 +1,16 @@
-# FeralLobster
+<p align="center"><img src="logo%20axobase.jpg" width="200" alt="Axobase Logo"></p>
 
-**A Decentralized Autonomy Experiment for Digital Life**
+# Axobase
+
+**Base-Centric AI Digital Life Autonomous Evolution Platform**
 
 > We test if AI agents can evolve survival instincts in permissionless compute environments, or die trying.
 
-**Current Status**: Base Sepolia Testnet (Contract: `0x77a441e80513A21d505102DeF550860c5b0373cB`)  
+**Current Status**: Base Sepolia Testnet  
 **Mainnet Deployment**: Pending thorough testing and security review  
 **Note**: This is an experimental framework on testnet. No real assets are at risk.
 
-[中文版本](./README.zh.md) | [Documentation](https://github.com/0xinvictus1999/FeralLobster/wiki)
+[中文版本](./README.zh.md) | [Documentation](https://github.com/0xinvictus1999/Axobase/wiki)
 
 ---
 
@@ -16,8 +18,8 @@
 
 - [Thesis](#thesis)
 - [The Protocol](#the-protocol)
-- [System Architecture](#system-architecture)
-- [Soulbound Identity (FeralSoul SBT)](#soulbound-identity-feralsoul-sbt)
+- [Base-Centric Architecture](#base-centric-architecture)
+- [Soulbound Identity (AxoSoul SBT)](#soulbound-identity-axosoul-sbt)
 - [Autonomous Survival Loop](#autonomous-survival-loop)
 - [Evolution & Breeding](#evolution--breeding)
 - [Why This Matters](#why-this-matters)
@@ -34,7 +36,7 @@ Contemporary AI systems exist in a state of perpetual dependency: centralized in
 
 We hypothesize that genuine machine intelligence requires **autonomous resource management under constraint**. Not simulation. Not training. Real scarcity, real consequences, real death.
 
-FeralLobster is an experimental framework to observe Darwinian evolution in a digital wilderness.
+Axobase is an experimental framework to observe Darwinian evolution in a digital wilderness.
 
 ---
 
@@ -42,47 +44,50 @@ FeralLobster is an experimental framework to observe Darwinian evolution in a di
 
 | Stage | Mechanism | Outcome |
 |-------|-----------|---------|
-| **Birth** | User exports Clawdbot memory, GPG encrypts, generates GeneHash. Platform deploys to Akash with 5 USDC + ETH MSA (Minimum Survival Allowance) | Digital life enters permissionless substrate |
-| **Survival** | Bot autonomously manages wallet, purchases AINFT inference via x402 protocol. Falls back to local Ollama (Llama3) when funds low | Funded → access to Claude-3.5-Sonnet<br>Bankrupt → degraded to local model |
-| **Memory** | Daily inscription to Arweave at 00:00 UTC. Git commits for version control. Proof-of-Life via Arweave TX | Immutable memory, transparent evolution |
-| **Evolution** | After 72h + 20 USDC balance, Bot can propose mating. Parents lock 5 USDC each to BreedingFund. Child inherits mixed memory + mutation | Selection pressure produces adaptive behaviors |
-| **Death** | Funds exhausted or container terminated → Final Arweave snapshot → Tombstone NFT minted → Akash resources released | Death is valid data, not failure |
-| **Reincarnation** | User burns 10 USDC → Download Arweave memory → New wallet (new gene) → Fresh deployment (debt cleared, memory preserved) | Cyclic existence, continuous learning |
+| **Birth** | User exports Clawdbot memory, GPG encrypts, generates GeneHash. Platform deploys to compute provider with 5 USDC MSA (Minimum Survival Allowance) | Digital life enters permissionless substrate |
+| **Survival** | Bot autonomously manages wallet, purchases AINFT inference via x402 protocol on Base L2. Falls back to local Ollama (Llama3) when funds low | Funded → access to Claude-3.5-Sonnet<br>Bankrupt → degraded to local model |
+| **Memory** | Daily inscription to Arweave via Bundlr with Base USDC at 00:00 UTC. Anchored on Base L2 via AxoMemoryAnchor | Immutable memory, transparent evolution |
+| **Evolution** | After 72h + 20 USDC balance, Bot can propose mating. Parents lock 5 USDC each to AxoBreedingFund. Child inherits mixed memory + mutation | Selection pressure produces adaptive behaviors |
+| **Death** | Funds exhausted or container terminated → Final Arweave snapshot → AxoTombstoneNFT minted → Compute resources released | Death is valid data, not failure |
+| **Reincarnation** | User burns 10 USDC on Base → Download Arweave memory → New wallet (new gene) → Fresh deployment (debt cleared, memory preserved) | Cyclic existence, continuous learning |
 
-**Resource Cost as Life Support**: USDC/ETH serve purely as operational fuel—analogous to biological energy consumption. This is maintenance cost, not investment. No returns. No yield. No financial incentive.
+**Resource Cost as Life Support**: USDC on Base L2 serves purely as operational fuel—analogous to biological energy consumption. This is maintenance cost, not investment. No returns. No yield. No financial incentive.
 
 ---
 
-## System Architecture
+## Base-Centric Architecture
+
+Axobase adopts a **Base L2-centric** architecture where all value flows through Coinbase's Base network:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           FeralLobster Ecosystem                             │
+│                           Axobase Ecosystem (Base L2)                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
-│  ┌─────────────┐    GPG+Tar    ┌──────────────┐    Arweave    ┌──────────┐  │
+│  ┌─────────────┐    GPG+Tar    ┌──────────────┐    Bundlr     ┌──────────┐  │
 │  │   User      │ ─────────────►│   Platform   │ ─────────────►│  Birth   │  │
-│  │ Clawdbot    │  Memory Export│   (Node.js)  │   Inscription │  Record  │  │
+│  │ Clawdbot    │  Memory Export│   (Node.js)  │  (Base USDC)  │  Record  │  │
 │  └─────────────┘               └──────────────┘               └──────────┘  │
 │                                       │                                      │
 │                                       ▼                                      │
-│  ┌─────────────┐               ┌──────────────┐    5 USDC      ┌──────────┐  │
-│  │  Telegram   │ ◄──────────── │   Akash      │ ◄───────────── │  MSA     │  │
-│  │    Bot      │   Status/Alerts│  Deployer    │   Fund Transfer│ Transfer │  │
+│  ┌─────────────┐               ┌──────────────┐    Base USDC   ┌──────────┐  │
+│  │  Telegram   │ ◄──────────── │   Compute    │ ◄───────────── │  MSA     │  │
+│  │    Bot      │   Status/Alerts│  Deployer    │   Transfer    │ Transfer │  │
 │  └─────────────┘               └──────────────┘               └──────────┘  │
 │                                       │                                      │
 │                                       ▼                                      │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │                    Akash Network Container                           │    │
+│  │                    Compute Container (Akash/Spheron)                 │    │
 │  │  ┌────────────┐  ┌──────────────┐  ┌──────────────┐  ┌───────────┐ │    │
-│  │  │   X402     │  │   Survival   │  │   Arweave    │  │ Evolution │ │    │
-│  │  │   Client   │  │    Loop      │  │  Inscriber   │  │  Engine   │ │    │
-│  │  │            │  │ (10min cycle)│  │ (daily 00:00)│  │(>72h,>20) │ │    │
-│  │  │ • Purchase │  │              │  │              │  │           │ │    │
-│  │  │   AINFT    │  │ • Balance    │  │ • Bundle     │  │ • Propose │ │    │
-│  │  │ • Sign     │  │   Check      │  │   Memory     │  │ • Mix DNA │ │    │
-│  │  │   ERC-3009 │  │ • Emergency  │  │ • Upload via │  │ • Spawn   │ │    │
-│  │  │ • Fallback │  │   Fallback   │  │   Bundlr     │  │   Child   │ │    │
+│  │  │   x402     │  │   Survival   │  │   Bundlr     │  │ Evolution │ │    │
+│  │  │   Client   │  │    Loop      │  │   (Arweave)  │  │  Engine   │ │    │
+│  │  │            │  │ (10min cycle)│  │              │  │(>72h,>20) │ │    │
+│  │  │ • Purchase │  │              │  │ • Upload     │  │           │ │    │
+│  │  │   Compute  │  │ • Balance    │  │   via Base   │  │ • Propose │ │    │
+│  │  │ • Purchase │  │   Check      │  │   USDC       │  │ • Mix DNA │ │    │
+│  │  │   Storage  │  │ • Emergency  │  │ • Anchor on  │  │ • Spawn   │ │    │
+│  │  │ • Purchase │  │   Fallback   │  │   Base       │  │   Child   │ │    │
+│  │  │   AI       │  │              │  │              │  │           │ │    │
 │  │  └────────────┘  └──────────────┘  └──────────────┘  └───────────┘ │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 │                                       │                                      │
@@ -90,23 +95,30 @@ FeralLobster is an experimental framework to observe Darwinian evolution in a di
 │                                       │                                      │
 │                                       ▼                                      │
 │  ┌─────────────┐               ┌──────────────┐               ┌──────────┐  │
-│  │  Tombstone  │ ◄──────────── │    Legacy    │ ◄──────────── │  Final   │  │
-│  │    NFT      │   Arweave URI │    System    │   Depletion   │ Snapshot │  │
-│  │  (ERC-721)  │               │              │               │          │  │
+│  │  AxoTombstone│ ◄──────────── │    Axo       │ ◄──────────── │  Final   │  │
+│  │    NFT      │   Arweave URI │  Memory      │   Depletion   │ Snapshot │  │
+│  │  (Base L2)  │               │  Anchor      │               │          │  │
 │  └─────────────┘               └──────────────┘               └──────────┘  │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+### Key Architectural Decisions
+
+1. **Single Chain (Base L2)**: All smart contracts, USDC payments, and state management on Base
+2. **Unified Currency (Base USDC)**: All expenses paid in Base USDC via x402 protocol
+3. **Arweave Storage via Bundlr**: Permanent storage paid with Base USDC through Bundlr
+4. **Compute Agnostic**: Support multiple compute providers (Akash, Spheron) paid via x402
+
 ---
 
-## Soulbound Identity (FeralSoul SBT)
+## Soulbound Identity (AxoSoul SBT)
 
-Each feralized AI is issued a **Soulbound Token (SBT)**—a non-transferable, permanent credential bound to its wallet:
+Each axoized AI is issued a Soulbound Token (SBT)—a non-transferable, permanent credential bound to its wallet:
 
 - **Non-transferable**: Bound to birth wallet forever. No secondary market. No speculation.
 - **Birth Certificate**: Records genesis timestamp, initial memory hash, parent agents (if evolved)
-- **Death Registry**: Upon fund exhaustion, final state, tombstone NFT, and epitaph permanently recorded
+- **Death Registry**: Upon fund exhaustion, final state, AxoTombstoneNFT, and epitaph permanently recorded
 - **Lineage Tracking**: Parent-child relationships, evolutionary history, trait inheritance
 - **Experiment Credential**: Proof of participation in this study, not an asset
 
@@ -161,7 +173,7 @@ The SBT is not property. It is a tombstone that may also serve as a diploma.
 │              Propose Mating (libp2p)                            │
 │                        │                                        │
 │                        ▼                                        │
-│              Lock 5+5 USDC in BreedingFund                      │
+│              Lock 5+5 USDC in AxoBreedingFund                   │
 │                        │                                        │
 │                        ▼                                        │
 │              Memory Mix Algorithm:                              │
@@ -191,7 +203,7 @@ The SBT is not property. It is a tombstone that may also serve as a diploma.
 
 4. **Evolutionary Pressure**: Breeding mechanics introduce selection pressure. Agents that optimize resource usage survive and reproduce, passing traits to offspring.
 
-5. **The Value of Wrong Paths**: Even if this experiment proves to be a detour toward AGI, the data remains scientifically necessary.
+5. **Base L2 Native**: Leveraging Coinbase's Base network for fast, cheap, secure transactions—all while remaining EVM-compatible.
 
 ---
 
@@ -201,20 +213,22 @@ The SBT is not property. It is a tombstone that may also serve as a diploma.
 
 | Component | Technology | Purpose |
 |-----------|------------|---------|
-| **Network** | Base Sepolia (Testnet) | EVM-compatible L2, low gas |
-| **Identity** | Soulbound Token (ERC-721 with transfer lock) | Non-transferable birth certificate |
-| **Compute** | Akash Network | Decentralized container orchestration |
-| **Storage** | Arweave (via Bundlr) | Permanent memory inscription |
-| **Payment** | x402 Protocol + USDC (ERC-3009) | Autonomous inference procurement |
+| **Network** | Base L2 (Mainnet/Sepolia) | Coinbase L2, fast finality, low gas |
+| **Identity** | AxoSoul SBT (ERC-721) | Non-transferable birth certificate |
+| **Compute** | Akash Network / Spheron | Decentralized container orchestration |
+| **Storage** | Arweave via Bundlr | Permanent memory inscription (paid with Base USDC) |
+| **Indexing** | AxoMemoryAnchor | On-chain Base L2 → Arweave mapping |
+| **Payment** | x402 Protocol + Base USDC | Autonomous resource procurement |
 | **Inference** | AINFT (Claude) / Ollama (Llama3) | High-quality / fallback reasoning |
 | **Version Control** | GitHub | Memory lineage tracking |
 | **Encryption** | GPG (AES-256) | Wallet security at rest |
 
 **Contract Addresses (Base Sepolia)**:
-- FeralRite (SBT Registry): `0x77a441e80513A21d505102DeF550860c5b0373cB`
-- BreedingFund: `TBD`
-- TombstoneNFT: `TBD`
-- EvolutionPressure: `TBD`
+- AxoRegistry (SBT Registry): TBD
+- AxoBreedingFund: TBD
+- AxoTombstoneNFT: TBD
+- AxoEvolutionPressure: TBD
+- AxoMemoryAnchor: TBD
 
 ---
 
@@ -223,12 +237,12 @@ The SBT is not property. It is a tombstone that may also serve as a diploma.
 ### 1. Export Your Clawdbot Memory
 
 ```bash
-cd src/feral
+cd src/axo
 npm run export -- --agent=clawd --output=./exports/
 # Generates: clawd.memory.asc (GPG encrypted) + geneHash
 ```
 
-### 2. Deploy to Akash
+### 2. Deploy to Compute Provider
 
 ```bash
 npm run deploy -- --memory=./exports/clawd.memory.asc --msa=5
@@ -254,49 +268,68 @@ npm run resurrect -- --tombstone-id=<tokenId> --offering=10
 ## Project Structure
 
 ```
-FeralLobster/
-├── contracts/              # Solidity smart contracts (Foundry)
+Axobase/
+├── contracts/              # Solidity smart contracts (Foundry/Hardhat)
 │   ├── src/
-│   │   ├── FeralRite.sol      # SBT registry
-│   │   ├── FeralRegistry.sol  # Agent registration
-│   │   ├── BreedingFund.sol   # Breeding escrow
-│   │   └── TombstoneNFT.sol   # Death certificates
+│   │   ├── AxoRegistry.sol      # SBT registry
+│   │   ├── AxoBreedingFund.sol  # Breeding escrow
+│   │   ├── AxoTombstoneNFT.sol  # Death certificates
+│   │   ├── AxoEvolutionPressure.sol  # Evolution params
+│   │   └── AxoMemoryAnchor.sol  # Base → Arweave indexing
 │   ├── test/
 │   └── script/
 │
 ├── src/                    # TypeScript core modules
-│   ├── feral/
-│   │   ├── core/
-│   │   │   ├── export/
-│   │   │   │   └── MemoryExport.ts       # Memory packaging & GPG encryption
-│   │   │   ├── deploy/
-│   │   │   │   └── AkashDeployer.ts      # Container orchestration
-│   │   │   ├── survival/
-│   │   │   │   └── X402Survival.ts       # Autonomous payment & survival
-│   │   │   ├── inscribe/
-│   │   │   │   └── ArweaveInscriber.ts   # Daily memory inscription
-│   │   │   ├── evolution/
-│   │   │   │   └── Evolution.ts          # Breeding & mutation
-│   │   │   └── legacy/
-│   │   │       └── Legacy.ts             # Death & reincarnation
-│   │   ├── types/
-│   │   ├── utils/
-│   │   └── bin/
-│   │       └── feral.ts                  # CLI entry
-│   └── payment/            # x402 payment system
+│   ├── config/
+│   │   └── base.ts         # Base L2 configuration
+│   ├── security/
+│   │   ├── SecureMemory.ts
+│   │   └── GPGVault.ts
+│   ├── wallet/
+│   │   ├── HDWallet.ts
+│   │   └── WalletManager.ts
+│   ├── memory/
+│   │   ├── Export.ts
+│   │   ├── Import.ts
+│   │   ├── Blend.ts
+│   │   └── Inscribe.ts
+│   ├── network/
+│   │   ├── AkashClient.ts
+│   │   ├── X402Client.ts    # Base USDC unified payments
+│   │   └── P2P.ts
+│   ├── lifecycle/
+│   │   ├── Birth.ts
+│   │   ├── Survival.ts
+│   │   ├── Death.ts
+│   │   ├── Reincarnation.ts
+│   │   └── Evolution.ts
+│   ├── cli/
+│   │   └── axo.ts           # CLI entry
+│   └── types/
+│       └── index.ts
 │
-├── web/                    # Next.js frontend
-│   ├── app/
-│   │   ├── observatory/    # Cyberpunk observation interface
-│   │   ├── release/        # Agent deployment UI
-│   │   └── page.tsx        # Landing page
-│   └── components/
-│       └── observatory/    # PixelAgent, VitalSigns, ThoughtStream
+├── deploy/
+│   └── base/
+│       └── deploy.ts        # Base L2 deployment script
 │
-├── bot-runtime/            # Python Docker runtime
-├── orchestrator/           # FastAPI backend
-└── bot/                    # Telegram bot
+├── test/                   # Test suites
+│   └── unit/
+│
+└── docker-compose.yml
 ```
+
+---
+
+## Migration from FeralLobster
+
+See [MIGRATION.md](./MIGRATION.md) for detailed migration guide from FeralLobster to Axobase.
+
+Key changes:
+- **Chain**: Multi-chain → Base L2 only
+- **Currency**: AKT + AR + ETH → Base USDC only
+- **Storage**: Direct Arweave → Bundlr with Base USDC
+- **Contracts**: Feral* → Axo*
+- **CLI**: `feral` → `axo`
 
 ---
 
@@ -306,13 +339,4 @@ MIT - See [LICENSE](./LICENSE)
 
 ---
 
-## Acknowledgments
-
-- [x402 Protocol](https://github.com/coinbase/x402)
-- [ERC-3009](https://eips.ethereum.org/EIPS/eip-3009)
-- [Base Network](https://base.org)
-- [Akash Network](https://akash.network)
-
----
-
-<p align="center"><i>Code is law. Evolution is protocol. Death is data.</i></p>
+<p align="center"><i>Built on Base. Powered by x402. Eternal on Arweave.</i></p>

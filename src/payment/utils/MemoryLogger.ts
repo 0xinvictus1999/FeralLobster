@@ -22,7 +22,7 @@ export class MemoryLogger {
   private transactionDir: string;
 
   constructor(options: MemoryLoggerOptions) {
-    this.feralHome = options.feralHome || process.env.FERAL_HOME || '/app';
+    this.feralHome = options.feralHome || process.env.AXO_HOME || '/app';
     this.agentId = options.agentId || process.env.AGENT_ID || 'default';
     this.enableGitCommit = options.enableGitCommit ?? true;
     

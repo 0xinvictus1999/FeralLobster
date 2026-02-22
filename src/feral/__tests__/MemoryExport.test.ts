@@ -36,7 +36,7 @@ describe('MemoryExport', () => {
   beforeEach(async () => {
     // Remove export marker if exists
     try {
-      await fs.unlink(join(testDir, '.FERAL_EXPORTED'));
+      await fs.unlink(join(testDir, '.AXO_EXPORTED'));
     } catch {}
   });
 
@@ -112,7 +112,7 @@ describe('MemoryExport', () => {
       });
 
       // Mark as already exported
-      await fs.writeFile(join(testDir, '.FERAL_EXPORTED'), '{}');
+      await fs.writeFile(join(testDir, '.AXO_EXPORTED'), '{}');
 
       await expect(exporter.exportMemory()).rejects.toThrow('already exported');
     });

@@ -1,6 +1,6 @@
 # 🔧 Orchestrator API
 
-FeralLobster 编排服务 - FastAPI 后端
+Axobase 编排服务 - FastAPI 后端
 
 ## ⚠️ 网络声明
 
@@ -54,7 +54,7 @@ Orchestrator
        └── 更新 Soul.bot_wallet
 
 3. 用户链上注册
-   └── 调用 FeralRite.registerFeral()
+   └── 调用 AxoRite.registerFeral()
 
 4. 监听器捕获事件
    └── FeralRegistered 事件
@@ -86,7 +86,7 @@ cp .env.example .env
 
 ```env
 # 数据库
-DATABASE_URL=sqlite:///./feral.db
+DATABASE_URL=sqlite:///./axo.db
 
 # Arweave (JWK JSON)
 ARWEAVE_KEY={"kty":"RSA",...}

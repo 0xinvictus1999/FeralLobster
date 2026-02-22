@@ -66,8 +66,8 @@ export class AkashClient {
     const sdl: AkashSDL = {
       version: '2.0',
       services: {
-        [`feral-bot-${shortHash}`]: {
-          image: 'ghcr.io/ferallobster/bot-runtime:latest',
+        [`axo-bot-${shortHash}`]: {
+          image: 'ghcr.io/axobase/bot-runtime:latest',
           expose: [
             {
               port: 3000,
@@ -92,7 +92,7 @@ export class AkashClient {
       },
       profiles: {
         compute: {
-          [`feral-bot-${shortHash}`]: {
+          [`axo-bot-${shortHash}`]: {
             resources: {
               cpu: { units: config.cpuLimit || 0.5 },
               memory: { size: config.memoryLimit || '512Mi' },
@@ -103,7 +103,7 @@ export class AkashClient {
         placement: {
           dcloud: {
             pricing: {
-              [`feral-bot-${shortHash}`]: {
+              [`axo-bot-${shortHash}`]: {
                 denom: 'uakt',
                 amount: 100,
               },
@@ -112,9 +112,9 @@ export class AkashClient {
         },
       },
       deployment: {
-        [`feral-bot-${shortHash}`]: {
+        [`axo-bot-${shortHash}`]: {
           dcloud: {
-            profile: `feral-bot-${shortHash}`,
+            profile: `axo-bot-${shortHash}`,
             count: 1,
           },
         },
@@ -315,7 +315,7 @@ export class AkashClient {
     if (process.env.NODE_ENV === 'test' || process.env.MOCK_AKASH) {
       return {
         state: 'active',
-        uri: `https://feral-bot-${dseq}.akash.network`,
+        uri: `https://axo-bot-${dseq}.akash.network`,
         provider: 'akash-provider-1',
       };
     }

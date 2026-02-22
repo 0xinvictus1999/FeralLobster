@@ -17,8 +17,8 @@ import { bootstrap } from '@libp2p/bootstrap';
 import { PeerId } from '@libp2p/interface-peer-id';
 import { MatingProposal, PeerMetadata } from '../types/index.js';
 
-const FERAL_TOPIC = 'feral-bots';
-const MATING_TOPIC = 'feral-mating';
+const AXO_TOPIC = 'axo-bots';
+const MATING_TOPIC = 'axo-mating';
 const DEFAULT_BOOTSTRAP_LIST = [
   '/dns4/bootstrap.libp2p.io/tcp/443/wss/p2p-websocket-star/',
 ];
@@ -77,7 +77,7 @@ export class P2PNetwork {
     this.node = await createLibp2p(options);
 
     // Subscribe to topics
-    await this.node.pubsub.subscribe(FERAL_TOPIC);
+    await this.node.pubsub.subscribe(AXO_TOPIC);
     await this.node.pubsub.subscribe(MATING_TOPIC);
 
     // Handle incoming messages
@@ -129,7 +129,7 @@ export class P2PNetwork {
       signature: await this.signMessage(this.config.geneHash),
     };
 
-    await this.publish(FERAL_TOPIC, message);
+    await this.publish(AXO_TOPIC, message);
   }
 
   /**
@@ -144,7 +144,7 @@ export class P2PNetwork {
       signature: await this.signMessage(this.config.geneHash),
     };
 
-    await this.publish(FERAL_TOPIC, message);
+    await this.publish(AXO_TOPIC, message);
     console.log(`[P2P] Broadcasted distress: ${reason}`);
   }
 

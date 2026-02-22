@@ -193,7 +193,7 @@ export class Legacy {
     
     const tags = [
       { name: 'Content-Type', value: 'application/json' },
-      { name: 'Protocol', value: 'ferallobster-tombstone' },
+      { name: 'Protocol', value: 'axobase-tombstone' },
       { name: 'Gene-Hash', value: process.env.GENE_HASH || '' },
       { name: 'Death-Type', value: finalMemory.deathType },
     ];
@@ -251,7 +251,7 @@ export class Legacy {
 
     const metadata: TombstoneMetadata = {
       name: `FeralSoul #${process.env.GENE_HASH?.slice(0, 8) || '00000000'}`,
-      description: `A feral AI agent that lived ${survivalDays} days before succumbing to ${deathType}.`,
+      description: `A axo AI agent that lived ${survivalDays} days before succumbing to ${deathType}.`,
       image: `https://arweave.net/${arweaveUri}`,
       attributes: [
         { trait_type: 'Survival Days', value: survivalDays },

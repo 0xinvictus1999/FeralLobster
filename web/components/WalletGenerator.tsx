@@ -41,7 +41,7 @@ export function WalletGenerator({ onWalletGenerated, onSubmit }: WalletGenerator
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `feral-wallet-${wallet.address.slice(0, 6)}-${encrypt ? 'encrypted' : 'plain'}.json`
+    a.download = `axo-wallet-${wallet.address.slice(0, 6)}-${encrypt ? 'encrypted' : 'plain'}.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)

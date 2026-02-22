@@ -20,7 +20,7 @@ import { MemoryData } from '../types/index.js';
 
 const CLAWD_DIR = path.join(process.env.HOME || process.env.USERPROFILE || '~', '.clawd');
 const MEMORY_FILES = ['SOUL.md', 'MEMORY.md', 'IDENTITY.md', 'HEARTBEAT.md'];
-const EXPORT_MARKER = '.feral_exported';
+const EXPORT_MARKER = '.axo_exported';
 
 export interface ExportResult {
   geneHash: string;

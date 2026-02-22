@@ -1,6 +1,6 @@
-# FeralLobster x402 Payment System
+# Axobase x402 Payment System
 
-AI Agent Autonomous Payment Framework for FeralLobster. Enables digital life forms to independently procure compute resources through the x402 payment protocol.
+AI Agent Autonomous Payment Framework for Axobase. Enables digital life forms to independently procure compute resources through the x402 payment protocol.
 
 ## Overview
 
@@ -76,7 +76,7 @@ npm run test:x402
 | `PRIVATE_KEY_GPG_PASSPHRASE` | Yes | GPG passphrase for wallet encryption |
 | `BASE_RPC_URL` | Yes | Base network RPC endpoint |
 | `NETWORK` | No | `base` or `baseSepolia` (default: baseSepolia) |
-| `FERAL_HOME` | No | Project root path (default: /app) |
+| `AXO_HOME` | No | Project root path (default: /app) |
 | `AGENT_ID` | No | Unique agent identifier |
 | `HARDWARE_WALLET` | No | Enable hardware wallet mode (default: false) |
 | `OPENROUTER_API_KEY` | No | Fallback API key for OpenRouter |
@@ -87,10 +87,10 @@ npm run test:x402
 ### Basic Inference with Auto-Payment
 
 ```typescript
-import { FeralPayment } from '@ferallobster/payment';
+import { FeralPayment } from '@axobase/payment';
 
 const payment = new FeralPayment({
-  agentId: 'my-feral-agent',
+  agentId: 'my-axo-agent',
   network: 'baseSepolia',
 });
 
@@ -202,7 +202,7 @@ npm run export-wallet -- --gpg-key=backup@example.com
 
 ### Private Key Protection
 
-- **GPG Encryption**: All private keys stored encrypted at rest (`~/.feral/wallet.asc`)
+- **GPG Encryption**: All private keys stored encrypted at rest (`~/.axo/wallet.asc`)
 - **Secure Memory**: Decrypted keys only exist in RAM, never on disk
 - **Auto-Cleanup**: Keys wiped on process exit, crash, or timeout
 - **No Logging**: Private keys never logged or exposed in error traces
@@ -273,20 +273,20 @@ npm run test:watch
 version: "2.0"
 services:
   payment:
-    image: ferallobster/payment:latest
+    image: axobase/payment:latest
     env:
       - PRIVATE_KEY_GPG_PASSPHRASE=<encrypted>
       - BASE_RPC_URL=https://sepolia.base.org
       - NETWORK=baseSepolia
     volumes:
-      - wallet:/app/.feral
+      - wallet:/app/.axo
 ```
 
 ### Docker
 
 ```bash
-docker build -t ferallobster/payment .
-docker run -e PRIVATE_KEY_GPG_PASSPHRASE=<pass> ferallobster/payment
+docker build -t axobase/payment .
+docker run -e PRIVATE_KEY_GPG_PASSPHRASE=<pass> axobase/payment
 ```
 
 ## License

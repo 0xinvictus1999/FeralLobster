@@ -17,7 +17,7 @@ global.TextDecoder = TextDecoder as any;
 // };
 
 // Set test environment variables
-process.env.FERAL_HOME = '/tmp/test-feral';
+process.env.AXO_HOME = '/tmp/test-axo';
 process.env.AGENT_ID = 'test-agent';
 process.env.PRIVATE_KEY_GPG_PASSPHRASE = 'test-passphrase';
 process.env.NETWORK = 'baseSepolia';

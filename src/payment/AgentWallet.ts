@@ -124,7 +124,7 @@ export class AgentWallet {
 
   constructor(options: AgentWalletOptions, config: X402Config) {
     this.agentId = options.agentId || process.env.AGENT_ID || 'default';
-    this.feralHome = options.feralHome || process.env.FERAL_HOME || '/app';
+    this.feralHome = options.feralHome || process.env.AXO_HOME || '/app';
     this.hardwareWallet = options.hardwareWallet || process.env.HARDWARE_WALLET === 'true';
     this.config = config;
 

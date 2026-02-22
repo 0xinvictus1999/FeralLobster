@@ -300,7 +300,7 @@ export class Evolution {
    */
   private async downloadParentMemory(dseq: string): Promise<any> {
     // Query registry for parent info
-    const registryUrl = process.env.FERAL_REGISTRY_URL || '';
+    const registryUrl = process.env.AXO_REGISTRY_URL || '';
     
     try {
       const response = await axios.get(`${registryUrl}/agent/${dseq}`);
@@ -438,7 +438,7 @@ export class Evolution {
    * Submit proposal to registry
    */
   private async submitProposalToRegistry(proposal: BreedingProposal): Promise<void> {
-    const registryUrl = process.env.FERAL_REGISTRY_URL || '';
+    const registryUrl = process.env.AXO_REGISTRY_URL || '';
     
     try {
       await axios.post(`${registryUrl}/proposals`, proposal);
@@ -451,7 +451,7 @@ export class Evolution {
    * Update registry lineage
    */
   private async updateRegistryLineage(geneHash: string, lineage: Lineage): Promise<void> {
-    const registryUrl = process.env.FERAL_REGISTRY_URL || '';
+    const registryUrl = process.env.AXO_REGISTRY_URL || '';
     
     try {
       await axios.post(`${registryUrl}/lineage/${geneHash}`, lineage);
@@ -464,7 +464,7 @@ export class Evolution {
    * Get lineage from registry
    */
   private async getLineageFromRegistry(geneHash: string): Promise<Lineage | null> {
-    const registryUrl = process.env.FERAL_REGISTRY_URL || '';
+    const registryUrl = process.env.AXO_REGISTRY_URL || '';
     
     try {
       const response = await axios.get(`${registryUrl}/lineage/${geneHash}`);

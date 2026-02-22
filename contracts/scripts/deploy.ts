@@ -1,8 +1,8 @@
 /**
- * FeralLobster Contract Deployment Script
+ * Axobase Contract Deployment Script
  * 
  * Deploys:
- * 1. FeralRegistry - Bot registry
+ * 1. AxoRegistry - Bot registry
  * 2. BreedingFund - Breeding escrow
  * 3. TombstoneNFT - Death certificates
  * 4. EvolutionPressure - Evolution parameters
@@ -14,7 +14,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 async function main(hre: HardhatRuntimeEnvironment) {
   const [deployer] = await hre.ethers.getSigners();
   
-  console.log("Deploying FeralLobster contracts...");
+  console.log("Deploying Axobase contracts...");
   console.log("Deployer:", deployer.address);
   console.log("Network:", hre.network.name);
 
@@ -22,13 +22,13 @@ async function main(hre: HardhatRuntimeEnvironment) {
   const usdcAddress = getUSDCAddress(hre.network.name);
   console.log("USDC Address:", usdcAddress);
 
-  // 1. Deploy FeralRegistry
-  console.log("\n1. Deploying FeralRegistry...");
-  const FeralRegistry = await hre.ethers.getContractFactory("FeralRegistry");
-  const registry = await FeralRegistry.deploy();
+  // 1. Deploy AxoRegistry
+  console.log("\n1. Deploying AxoRegistry...");
+  const AxoRegistry = await hre.ethers.getContractFactory("AxoRegistry");
+  const registry = await AxoRegistry.deploy();
   await registry.waitForDeployment();
   const registryAddress = await registry.getAddress();
-  console.log("FeralRegistry deployed to:", registryAddress);
+  console.log("AxoRegistry deployed to:", registryAddress);
 
   // 2. Deploy BreedingFund
   console.log("\n2. Deploying BreedingFund...");
@@ -72,7 +72,7 @@ async function main(hre: HardhatRuntimeEnvironment) {
   // Print deployment summary
   console.log("\n=== DEPLOYMENT SUMMARY ===");
   console.log("Network:", hre.network.name);
-  console.log("FeralRegistry:", registryAddress);
+  console.log("AxoRegistry:", registryAddress);
   console.log("BreedingFund:", breedingFundAddress);
   console.log("TombstoneNFT:", tombstoneAddress);
   console.log("EvolutionPressure:", evolutionAddress);
@@ -84,7 +84,7 @@ async function main(hre: HardhatRuntimeEnvironment) {
     deployer: deployer.address,
     timestamp: new Date().toISOString(),
     contracts: {
-      FeralRegistry: registryAddress,
+      AxoRegistry: registryAddress,
       BreedingFund: breedingFundAddress,
       TombstoneNFT: tombstoneAddress,
       EvolutionPressure: evolutionAddress,
@@ -107,9 +107,9 @@ async function main(hre: HardhatRuntimeEnvironment) {
         address: registryAddress,
         constructorArguments: [],
       });
-      console.log("FeralRegistry verified");
+      console.log("AxoRegistry verified");
     } catch (e) {
-      console.log("FeralRegistry verification failed:", (e as Error).message);
+      console.log("AxoRegistry verification failed:", (e as Error).message);
     }
 
     try {

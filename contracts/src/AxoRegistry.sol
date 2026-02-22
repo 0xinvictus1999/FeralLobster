@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /**
  * @title AxoRegistry
- * @dev Central registry for all Axobase AI bots
+ * @dev Central registry for all Axobase AI bots on Base L2
  * @notice Tracks birth, life status, lineage, and Arweave inscriptions
  */
 contract AxoRegistry is Ownable, ReentrancyGuard {
@@ -22,7 +22,8 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
     struct Bot {
         bytes32 geneHash;
         address wallet;
-        string akashDseq;
+        string computeDseq;      // Akash/Spheron deployment sequence
+        string computeProvider;  // akash | spheron
         BotStatus status;
         uint256 birthTime;
         uint256 deathTime;
@@ -45,14 +46,15 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
     uint256 public totalAlive;
     uint256 public totalDead;
     
-    // Authorized minters (BreedingFund, etc.)
+    // Authorized minters (AxoBreedingFund, etc.)
     mapping(address => bool) public authorizedMinters;
     
     // Events
     event BotBorn(
         bytes32 indexed geneHash,
         address indexed wallet,
-        string akashDseq,
+        string computeDseq,
+        string computeProvider,
         uint256 timestamp,
         bytes32[] parents,
         uint256 generation
@@ -96,19 +98,21 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
     function registerBirth(
         bytes32 geneHash,
         address wallet,
-        string calldata akashDseq,
+        string calldata computeDseq,
+        string calldata computeProvider,
         string calldata arweaveBirthTx,
         bytes32[] calldata parents,
         uint256 generation
     ) external onlyAuthorized nonReentrant {
         require(bots[geneHash].birthTime == 0, "Bot already exists");
         require(wallet != address(0), "Invalid wallet");
-        require(bytes(akashDseq).length > 0, "Invalid dseq");
+        require(bytes(computeDseq).length > 0, "Invalid dseq");
         
         Bot storage bot = bots[geneHash];
         bot.geneHash = geneHash;
         bot.wallet = wallet;
-        bot.akashDseq = akashDseq;
+        bot.computeDseq = computeDseq;
+        bot.computeProvider = computeProvider;
         bot.status = BotStatus.Alive;
         bot.birthTime = block.timestamp;
         bot.parents = parents;
@@ -128,7 +132,8 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
         emit BotBorn(
             geneHash,
             wallet,
-            akashDseq,
+            computeDseq,
+            computeProvider,
             block.timestamp,
             parents,
             generation
@@ -191,11 +196,16 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
     }
     
     /**
-     * @dev Update Akash dseq
+     * @dev Update compute deployment info
      */
-    function updateDseq(bytes32 geneHash, string calldata newDseq) external onlyAuthorized {
+    function updateComputeInfo(
+        bytes32 geneHash, 
+        string calldata newDseq,
+        string calldata newProvider
+    ) external onlyAuthorized {
         require(bytes(newDseq).length > 0, "Invalid dseq");
-        bots[geneHash].akashDseq = newDseq;
+        bots[geneHash].computeDseq = newDseq;
+        bots[geneHash].computeProvider = newProvider;
     }
     
     /**
@@ -235,16 +245,13 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
     }
     
     /**
-     * @dev Get all active (alive) bots
+     * @dev Get bot compute info
      */
-    function getActiveBots(uint256 offset, uint256 limit) external view returns (bytes32[] memory) {
-        // This is a simplified implementation
-        // In production, you'd want an enumerable set
-        bytes32[] memory active = new bytes32[](limit);
-        uint256 count = 0;
-        
-        // Note: This is not efficient for large datasets
-        // Consider using The Graph for complex queries
-        return active;
+    function getComputeInfo(bytes32 geneHash) external view returns (
+        string memory dseq,
+        string memory provider
+    ) {
+        Bot storage bot = bots[geneHash];
+        return (bot.computeDseq, bot.computeProvider);
     }
 }

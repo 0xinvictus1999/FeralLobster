@@ -1,7 +1,7 @@
 version: '3.8'
 
 # =============================================================================
-# FeralLobster - 去中心化 AI 放养平台
+# Axobase - 去中心化 AI 放养平台
 # Docker Compose 配置
 # ⚠️ Base Sepolia Testnet Only - 禁止主网操作
 # =============================================================================
@@ -10,32 +10,32 @@ services:
   # PostgreSQL 数据库
   postgres:
     image: postgres:15-alpine
-    container_name: feral_postgres
+    container_name: axo_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: feral
-      POSTGRES_USER: feral
-      POSTGRES_PASSWORD: feral_testnet_only
+      POSTGRES_DB: axo
+      POSTGRES_USER: axo
+      POSTGRES_PASSWORD: axo_testnet_only
     volumes:
-      - feral_postgres_data:/var/lib/postgresql/data
+      - axo_postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U feral -d feral"]
+      test: ["CMD-SHELL", "pg_isready -U axo -d axo"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - feral-network
+      - axo-network
 
   # Redis 缓存
   redis:
     image: redis:7-alpine
-    container_name: feral_redis
+    container_name: axo_redis
     restart: unless-stopped
     command: redis-server --appendonly yes
     volumes:
-      - feral_redis_data:/data
+      - axo_redis_data:/data
     ports:
       - "6379:6379"
     healthcheck:
@@ -44,19 +44,19 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - feral-network
+      - axo-network
 
   # Orchestrator API
   orchestrator:
     build:
       context: ./orchestrator
       dockerfile: Dockerfile
-    container_name: feral_orchestrator
+    container_name: axo_orchestrator
     restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://feral:feral_testnet_only@postgres:5432/feral
+      - DATABASE_URL=postgresql://axo:axo_testnet_only@postgres:5432/axo
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
@@ -70,7 +70,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - feral-network
+      - axo-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
       interval: 30s
@@ -83,7 +83,7 @@ services:
     build:
       context: ./bot
       dockerfile: Dockerfile
-    container_name: feral_bot
+    container_name: axo_bot
     restart: unless-stopped
     environment:
       - PLATFORM_API_URL=http://orchestrator:8000
@@ -92,14 +92,14 @@ services:
     depends_on:
       - orchestrator
     networks:
-      - feral-network
+      - axo-network
 
   # Web Frontend
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
-    container_name: feral_web
+    container_name: axo_web
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -110,18 +110,18 @@ services:
     depends_on:
       - orchestrator
     networks:
-      - feral-network
+      - axo-network
 
   # Celery Worker (后台任务)
   celery:
     build:
       context: ./orchestrator
       dockerfile: Dockerfile
-    container_name: feral_celery
+    container_name: axo_celery
     restart: unless-stopped
     command: celery -A tasks worker --loglevel=info
     environment:
-      - DATABASE_URL=postgresql://feral:feral_testnet_only@postgres:5432/feral
+      - DATABASE_URL=postgresql://axo:axo_testnet_only@postgres:5432/axo
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
@@ -132,14 +132,14 @@ services:
       - redis
       - orchestrator
     networks:
-      - feral-network
+      - axo-network
 
   # Celery Beat (定时任务调度器)
   celery-beat:
     build:
       context: ./orchestrator
       dockerfile: Dockerfile
-    container_name: feral_celery_beat
+    container_name: axo_celery_beat
     restart: unless-stopped
     command: celery -A tasks beat --loglevel=info
     environment:
@@ -152,14 +152,14 @@ services:
       - redis
       - celery
     networks:
-      - feral-network
+      - axo-network
 
 volumes:
-  feral_postgres_data:
+  axo_postgres_data:
     driver: local
-  feral_redis_data:
+  axo_redis_data:
     driver: local
 
 networks:
-  feral-network:
+  axo-network:
     driver: bridge

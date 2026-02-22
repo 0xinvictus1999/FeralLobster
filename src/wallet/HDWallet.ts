@@ -12,7 +12,7 @@ import { Hex } from 'viem';
 import { WalletKeyPair } from '../types/index.js';
 import { SecureMemory } from '../security/SecureMemory.js';
 
-// Hardened derivation path for FeralLobster bots
+// Hardened derivation path for Axobase bots
 // m / 44' / 60' / 0' / 0 / geneHash-derived-index
 const BASE_PATH = "m/44'/60'/0'/0";
 

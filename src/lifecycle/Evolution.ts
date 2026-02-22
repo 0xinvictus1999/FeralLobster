@@ -399,7 +399,7 @@ export class EvolutionManager {
         parents: [],
         soul: {
           name: 'Partner Bot',
-          origin: 'FeralLobster',
+          origin: 'Axobase',
           purpose: 'Evolve and survive',
           values: ['adaptation', 'growth'],
           creationTimestamp: Date.now() - 30 * 24 * 60 * 60 * 1000,

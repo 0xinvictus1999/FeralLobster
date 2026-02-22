@@ -12,7 +12,7 @@ const mono = Share_Tech_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'FeralLobster - Decentralized Autonomy Experiment',
+  title: 'Axobase - Decentralized Autonomy Experiment',
   description: 'Digital life evolution in permissionless compute environments - Base Sepolia Testnet',
 }
 

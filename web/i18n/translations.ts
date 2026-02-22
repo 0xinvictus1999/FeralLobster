@@ -34,7 +34,7 @@ export const translations = {
     
     // Hero Section
     hero: {
-      title: 'FeralLobster',
+      title: 'Axobase',
       subtitle: 'A Decentralized Autonomy Experiment for Digital Life',
       tagline: 'We test if AI agents can evolve survival instincts in permissionless compute environments, or die trying.',
       startRelease: '🚀 Start Release',
@@ -165,7 +165,7 @@ export const translations = {
     
     // Hero Section
     hero: {
-      title: 'FeralLobster',
+      title: 'Axobase',
       subtitle: '去中心化数字生命自治实验',
       tagline: '我们测试AI代理能否在无需许可的计算市场中进化出生存本能，或者在尝试中死亡。',
       startRelease: '🚀 开始放养',

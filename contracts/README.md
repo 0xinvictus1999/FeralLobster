@@ -6,11 +6,11 @@ Base Sepolia 测试网上的智能合约，使用 Foundry 框架开发。
 
 | 合约 | 描述 | 状态 |
 |------|------|------|
-| `FeralRite.sol` | FeralSoul 注册与销毁仪式 | ✅ 已完成 |
-| `FeralRite.t.sol` | 完整测试套件 | ✅ 已完成 |
+| `AxoRite.sol` | FeralSoul 注册与销毁仪式 | ✅ 已完成 |
+| `AxoRite.t.sol` | 完整测试套件 | ✅ 已完成 |
 | `Deploy.s.sol` | Base Sepolia 部署脚本 | ✅ 已完成 |
 
-## FeralRite 合约功能
+## AxoRite 合约功能
 
 ### 核心概念
 - **FeralSoul**: 代表一个放养的 AI 代理，包含记忆哈希、钱包地址、出生时间等
@@ -107,7 +107,7 @@ forge script script/Deploy.s.sol --rpc-url base_sepolia --broadcast --verify
 
 ### 验证已部署合约
 ```bash
-forge verify-contract <CONTRACT_ADDRESS> src/FeralRite.sol:FeralRite --chain 84532
+forge verify-contract <CONTRACT_ADDRESS> src/AxoRite.sol:AxoRite --chain 84532
 ```
 
 ## 网络配置
@@ -144,7 +144,7 @@ forge test --fork-url https://sepolia.base.org
 格式:
 ```json
 {
-  "contract": "FeralRite",
+  "contract": "AxoRite",
   "chainId": 84532,
   "chainName": "Base Sepolia",
   "contractAddress": "0x...",

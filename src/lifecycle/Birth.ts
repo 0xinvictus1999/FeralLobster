@@ -5,7 +5,7 @@
  * - Decrypting GPG-encrypted memory files
  * - Verifying user deposits on chain
  * - Creating Akash deployment with proper configuration
- * - Registering bot on FeralRegistry contract
+ * - Registering bot on AxoRegistry contract
  * - Inscribing birth event to Arweave
  */
 
@@ -228,7 +228,7 @@ export class BirthRitualManager {
   }
 
   /**
-   * Step 6: Register bot on FeralRegistry contract
+   * Step 6: Register bot on AxoRegistry contract
    */
   private async registerOnChain(
     geneHash: string,
@@ -236,7 +236,7 @@ export class BirthRitualManager {
     akashDseq: string,
     arweaveBirthTx: string
   ): Promise<Hex> {
-    // In production, this would call the FeralRegistry contract
+    // In production, this would call the AxoRegistry contract
     // For now, simulate the transaction
 
     if (process.env.NODE_ENV === 'test' || process.env.MOCK_REGISTRY) {

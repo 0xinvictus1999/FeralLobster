@@ -193,7 +193,7 @@ export class GPGVault {
     
     const armor = [
       '-----BEGIN PGP MESSAGE-----',
-      `Comment: FeralLobster Encrypted Memory (${fingerprint})`,
+      `Comment: Axobase Encrypted Memory (${fingerprint})`,
       '',
       ...lines,
       '-----END PGP MESSAGE-----',

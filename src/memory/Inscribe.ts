@@ -295,7 +295,7 @@ export class ArweaveInscriber {
 
     try {
       const tags = [
-        { name: 'App-Name', value: 'FeralLobster' },
+        { name: 'App-Name', value: 'Axobase' },
         { name: 'Gene-Hash', value: geneHash },
         { name: 'Content-Type', value: 'application/json' },
         { name: 'Timestamp', value: Date.now().toString() },

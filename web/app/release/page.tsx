@@ -292,7 +292,7 @@ export default function ReleasePage() {
         </div>
 
         <div className="mt-8 text-center text-xs text-slate-600">
-          <p>FeralLobster - 去中心化 AI 放养平台</p>
+          <p>Axobase - 去中心化 AI 放养平台</p>
           <p className="mt-1">Network: Base Sepolia Testnet (Chain ID: 84532)</p>
         </div>
       </div>

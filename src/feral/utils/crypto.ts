@@ -1,7 +1,7 @@
 /**
  * Cryptographic Utilities
  * 
- * Provides cryptographic functions for the FeralLobster ecosystem:
+ * Provides cryptographic functions for the Axobase ecosystem:
  * - Merkle tree operations for GeneHash generation
  * - Wallet derivation from geneHash (HD wallets)
  * - Hashing utilities

@@ -1,7 +1,7 @@
 {
-  "name": "@ferallobster/core",
+  "name": "@axobase/core",
   "version": "0.1.0",
-  "description": "FeralLobster Digital Life System - Core Modules",
+  "description": "Axobase Digital Life System - Core Modules",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

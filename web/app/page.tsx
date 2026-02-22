@@ -12,7 +12,7 @@ export default function Home() {
       <div className="container mx-auto px-4 pt-24 pb-20">
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-            FeralLobster
+            Axobase
           </h1>
           <p className="text-xl md:text-2xl text-slate-400 mb-4">
             去中心化 AI 放养平台
@@ -35,7 +35,7 @@ export default function Home() {
               👁️ 观察舱
             </Link>
             <a
-              href="https://github.com/0xinvictus1999/FeralLobster"
+              href="https://github.com/0xinvictus1999/Axobase"
               target="_blank"
               rel="noopener noreferrer"
               className="px-8 py-4 bg-slate-800 border border-slate-700 rounded-lg font-semibold text-slate-300 hover:bg-slate-700 transition-all"

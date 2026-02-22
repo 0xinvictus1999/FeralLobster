@@ -26,14 +26,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     setLocaleState(newLocale);
     // Store preference in localStorage
     if (typeof window !== 'undefined') {
-      localStorage.setItem('feral-locale', newLocale);
+      localStorage.setItem('axo-locale', newLocale);
     }
   }, []);
 
   // Load saved preference on mount
   useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('feral-locale') as Locale;
+      const saved = localStorage.getItem('axo-locale') as Locale;
       if (saved && locales.includes(saved)) {
         setLocaleState(saved);
       }

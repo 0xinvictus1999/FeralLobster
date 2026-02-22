@@ -24,10 +24,10 @@ export class GPGManager {
   private walletDir: string;
 
   constructor(options: GPGManagerOptions) {
-    this.feralHome = options.feralHome || process.env.FERAL_HOME || '/app';
+    this.feralHome = options.feralHome || process.env.AXO_HOME || '/app';
     this.agentId = options.agentId || process.env.AGENT_ID || 'default';
     this.passphrase = options.passphrase || process.env.PRIVATE_KEY_GPG_PASSPHRASE || '';
-    this.walletDir = join(this.feralHome, '.feral');
+    this.walletDir = join(this.feralHome, '.axo');
   }
 
   /**

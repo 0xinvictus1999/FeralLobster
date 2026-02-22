@@ -5,11 +5,11 @@ import "@openzeppelin/access/Ownable.sol";
 import "@openzeppelin/token/ERC20/IERC20.sol";
 
 /**
- * @title FeralRite
+ * @title AxoRite
  * @dev 去中心化 AI 放养平台核心合约
  * @notice 管理 FeralSoul 的注册与销毁仪式
  */
-contract FeralRite is Ownable {
+contract AxoRite is Ownable {
     
     /**
      * @dev FeralSoul 结构体 - 代表一个放养的 AI 代理

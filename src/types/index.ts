@@ -1,5 +1,5 @@
 /**
- * FeralLobster - Core Type Definitions
+ * Axobase - Core Type Definitions
  */
 
 import { Hex } from 'viem';
@@ -362,7 +362,7 @@ export interface EvolutionStatus {
 // Contract Types
 // ============================================
 
-export interface FeralRegistryBot {
+export interface AxoRegistryBot {
   geneHash: Hex;
   wallet: Hex;
   akashDseq: string;

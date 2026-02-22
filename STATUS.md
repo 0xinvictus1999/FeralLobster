@@ -1,4 +1,4 @@
-# FeralLobster 项目状态存档 - 2024-02-21
+# Axobase 项目状态存档 - 2024-02-21
 
 ## 合约部署状态
 
@@ -17,7 +17,7 @@
 
 ### 核心模块 (7/7)
 - [x] **模块 1**: 项目骨架与 Git 初始化
-- [x] **模块 2**: 智能合约 FeralRite (Solidity)
+- [x] **模块 2**: 智能合约 AxoRite (Solidity)
 - [x] **模块 3**: Telegram Bot 交互层 (Python)
 - [x] **模块 4**: Web 前端确认层 (Next.js 14)
 - [x] **模块 5**: Orchestrator API (FastAPI)
@@ -25,7 +25,7 @@
 - [x] **模块 7**: 部署配置与文档
 
 ### 技术实现
-- [x] FeralRite 合约部署到 Base Sepolia 测试网
+- [x] AxoRite 合约部署到 Base Sepolia 测试网
 - [x] Foundry 配置修复（含 remappings）
 - [x] OpenZeppelin v4.9.3 和 forge-std 依赖集成
 - [x] 完整项目结构：contracts/, bot/, web/, orchestrator/, bot-runtime/
@@ -89,8 +89,8 @@ cd orchestrator && python -c "from database import init_db; init_db()"
 
 ```bash
 # 克隆项目
-git clone https://github.com/0xinvictus1999/FeralLobster.git
-cd FeralLobster
+git clone https://github.com/0xinvictus1999/Axobase.git
+cd Axobase
 
 # Docker 一键启动 (推荐)
 docker-compose up --build
@@ -121,7 +121,7 @@ grep "CONTRACT_ADDRESS" web/.env.local orchestrator/.env.example
 |------|------|
 | 总文件数 | 70+ |
 | 代码行数 | 5000+ |
-| 合约文件 | 3 (FeralRite, Deploy, Test) |
+| 合约文件 | 3 (AxoRite, Deploy, Test) |
 | 前端组件 | 6 |
 | API 端点 | 5+ |
 | Docker 服务 | 6 |
@@ -140,7 +140,7 @@ grep "CONTRACT_ADDRESS" web/.env.local orchestrator/.env.example
 
 ## 重要链接
 
-- **GitHub**: https://github.com/0xinvictus1999/FeralLobster
+- **GitHub**: https://github.com/0xinvictus1999/Axobase
 - **合约浏览器**: https://sepolia.basescan.org/address/0x77a441e80513A21d505102DeF550860c5b0373cB
 - **Base Sepolia 水龙头**: https://www.alchemy.com/faucets/base-sepolia
 

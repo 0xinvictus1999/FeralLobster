@@ -2,16 +2,16 @@
 pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
-import "../src/FeralRite.sol";
+import "../src/AxoRite.sol";
 
 /**
- * @title FeralRiteTest
- * @dev FeralRite 合约测试套件
+ * @title AxoRiteTest
+ * @dev AxoRite 合约测试套件
  * @notice 在 Base Sepolia Fork 上运行测试
  */
-contract FeralRiteTest is Test {
+contract AxoRiteTest is Test {
     
-    FeralRite public feralRite;
+    AxoRite public feralRite;
     
     // Base Sepolia 配置
     string public constant BASE_SEPOLIA_RPC = "https://sepolia.base.org";
@@ -56,7 +56,7 @@ contract FeralRiteTest is Test {
         
         // 部署合约
         vm.prank(owner);
-        feralRite = new FeralRite(platform);
+        feralRite = new AxoRite(platform);
     }
 
     // ============================================
@@ -72,7 +72,7 @@ contract FeralRiteTest is Test {
     function test_Deployment_RevertZeroAddress() public {
         vm.prank(owner);
         vm.expectRevert("Invalid platform address");
-        new FeralRite(address(0));
+        new AxoRite(address(0));
     }
 
     // ============================================
@@ -91,7 +91,7 @@ contract FeralRiteTest is Test {
         feralRite.registerFeral(testMemoryHash, botWallet, testArweaveId, testInitialFunds);
         
         // 验证状态
-        FeralRite.FeralSoul memory soul = feralRite.getFeralStatus(testMemoryHash);
+        AxoRite.FeralSoul memory soul = feralRite.getFeralStatus(testMemoryHash);
         assertEq(soul.memoryHash, testMemoryHash);
         assertEq(soul.botWallet, botWallet);
         assertEq(soul.birthTime, block.timestamp);
@@ -172,7 +172,7 @@ contract FeralRiteTest is Test {
         feralRite.confirmImmolation(testMemoryHash, zeroHashProof);
         
         // 验证状态
-        FeralRite.FeralSoul memory soul = feralRite.getFeralStatus(testMemoryHash);
+        AxoRite.FeralSoul memory soul = feralRite.getFeralStatus(testMemoryHash);
         assertTrue(soul.isImmolated, "Soul should be immolated");
     }
 
@@ -216,7 +216,7 @@ contract FeralRiteTest is Test {
         vm.prank(owner);
         feralRite.registerFeral(testMemoryHash, botWallet, testArweaveId, testInitialFunds);
         
-        FeralRite.FeralSoul memory soul = feralRite.getFeralStatus(testMemoryHash);
+        AxoRite.FeralSoul memory soul = feralRite.getFeralStatus(testMemoryHash);
         
         assertEq(soul.memoryHash, testMemoryHash);
         assertEq(soul.botWallet, botWallet);
@@ -249,7 +249,7 @@ contract FeralRiteTest is Test {
         vm.prank(owner);
         feralRite.registerFeral(testMemoryHash, botWallet, testArweaveId, testInitialFunds);
         
-        FeralRite.FeralSoul memory soul = feralRite.getSoulByWallet(botWallet);
+        AxoRite.FeralSoul memory soul = feralRite.getSoulByWallet(botWallet);
         assertEq(soul.memoryHash, testMemoryHash);
     }
 

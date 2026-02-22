@@ -1,6 +1,6 @@
 # 🐳 Bot Runtime
 
-FeralLobster AI 代理运行时环境
+Axobase AI 代理运行时环境
 
 ## ⚠️ 网络声明
 
@@ -38,19 +38,19 @@ USDC Balance < 1    → Hibernation (休眠退出)
 
 ```bash
 cd bot-runtime
-docker build -t ferallobster/bot-runtime:latest .
+docker build -t axobase/bot-runtime:latest .
 ```
 
 ## 运行容器
 
 ```bash
 docker run -d \
-  --name feral-bot \
+  --name axo-bot \
   -p 8000:8000 \
   -e ARWEAVE_ID=your_arweave_id \
   -e BOT_WALLET_PRIVATE_KEY=your_private_key \
   -e AINFT_API_KEY=your_api_key \
-  ferallobster/bot-runtime:latest
+  axobase/bot-runtime:latest
 ```
 
 ## 环境变量

@@ -1,11 +1,11 @@
 'use client'
 
 import { useReadContract, useWriteContract, useAccount, useChainId } from 'wagmi'
-import { CONTRACT_ADDRESS, FERAL_RITE_ABI, BASE_SEPOLIA_CHAIN_ID } from '@/lib/contract'
+import { CONTRACT_ADDRESS, AXO_RITE_ABI, BASE_SEPOLIA_CHAIN_ID } from '@/lib/contract'
 import { parseUnits } from 'viem'
 
 // ============================================
-// FeralRite 合约 Hooks
+// AxoRite 合约 Hooks
 // ⚠️ Base Sepolia Testnet Only
 // ============================================
 
@@ -39,7 +39,7 @@ export function useIsCorrectNetwork(): boolean {
 export function useGetFeralStatus(memoryHash?: `0x${string}`) {
   return useReadContract({
     address: CONTRACT_ADDRESS,
-    abi: FERAL_RITE_ABI,
+    abi: AXO_RITE_ABI,
     functionName: 'getFeralStatus',
     args: memoryHash ? [memoryHash] : undefined,
     query: {
@@ -54,7 +54,7 @@ export function useGetFeralStatus(memoryHash?: `0x${string}`) {
 export function useSoulExists(memoryHash?: `0x${string}`) {
   return useReadContract({
     address: CONTRACT_ADDRESS,
-    abi: FERAL_RITE_ABI,
+    abi: AXO_RITE_ABI,
     functionName: 'soulExists',
     args: memoryHash ? [memoryHash] : undefined,
     query: {
@@ -69,7 +69,7 @@ export function useSoulExists(memoryHash?: `0x${string}`) {
 export function useGetSoulByWallet(botWallet?: `0x${string}`) {
   return useReadContract({
     address: CONTRACT_ADDRESS,
-    abi: FERAL_RITE_ABI,
+    abi: AXO_RITE_ABI,
     functionName: 'getSoulByWallet',
     args: botWallet ? [botWallet] : undefined,
     query: {
@@ -94,7 +94,7 @@ export function useRegisterFeral() {
 
     writeContract({
       address: CONTRACT_ADDRESS,
-      abi: FERAL_RITE_ABI,
+      abi: AXO_RITE_ABI,
       functionName: 'registerFeral',
       args: [
         args.memoryHash,

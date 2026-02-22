@@ -1,6 +1,6 @@
 /**
  * FeralPayment - Main Integration Class
- * Exposes high-level API for FeralLobster system integration
+ * Exposes high-level API for Axobase system integration
  * Including Telegram Bot commands and automated payment flows
  */
 
@@ -40,7 +40,7 @@ export class FeralPayment {
 
   constructor(options: FeralPaymentOptions) {
     this.options = {
-      feralHome: process.env.FERAL_HOME || '/app',
+      feralHome: process.env.AXO_HOME || '/app',
       network: (process.env.NETWORK as 'base' | 'baseSepolia') || 'baseSepolia',
       ...options,
     };
@@ -129,7 +129,7 @@ export class FeralPayment {
       const request: InferenceRequest = {
         model: 'claude-3-5-sonnet',
         messages: [
-          { role: 'system', content: 'You are a feral AI agent operating autonomously.' },
+          { role: 'system', content: 'You are a axo AI agent operating autonomously.' },
           { role: 'user', content: task },
         ],
         temperature: 0.7,
@@ -170,7 +170,7 @@ export class FeralPayment {
     const request: InferenceRequest = {
       model: options?.model || 'claude-3-5-sonnet',
       messages: [
-        { role: 'system', content: 'You are a feral AI agent operating autonomously.' },
+        { role: 'system', content: 'You are a axo AI agent operating autonomously.' },
         { role: 'user', content: prompt },
       ],
       temperature: options?.temperature ?? 0.7,
@@ -274,7 +274,7 @@ export async function cli(command: string, args: string[]): Promise<void> {
       }
 
       const gpgManager = new GPGManager({
-        feralHome: process.env.FERAL_HOME || '/app',
+        feralHome: process.env.AXO_HOME || '/app',
         agentId,
         passphrase: gpgPassphrase,
       });

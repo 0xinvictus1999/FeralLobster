@@ -1,6 +1,6 @@
 # 🌐 Web Frontend
 
-FeralLobster 放养平台 - Next.js 14 Web 前端
+Axobase 放养平台 - Next.js 14 Web 前端
 
 ## ⚠️ 网络声明
 
@@ -64,7 +64,7 @@ cp .env.local.example .env.local
 编辑 `.env.local`:
 
 ```env
-NEXT_PUBLIC_CONTRACT_ADDRESS=0x...  # FeralRite 合约地址
+NEXT_PUBLIC_CONTRACT_ADDRESS=0x...  # AxoRite 合约地址
 NEXT_PUBLIC_RPC_URL=https://sepolia.base.org
 NEXT_PUBLIC_CHAIN_ID=84532
 NEXT_PUBLIC_PLATFORM_API_URL=http://localhost:8000

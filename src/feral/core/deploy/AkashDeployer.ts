@@ -28,7 +28,7 @@ export class AkashDeployer {
       rpcEndpoint: process.env.AKASH_RPC || 'https://rpc.akash.network:443',
       chainId: 'akashnet-2',
       mnemonic: process.env.AKASH_MNEMONIC || '',
-      sdlTemplate: './templates/feral-bot.yaml',
+      sdlTemplate: './templates/axo-bot.yaml',
       ...config,
     };
   }
@@ -119,7 +119,7 @@ export class AkashDeployer {
     await fs.writeFile(tempFile, privateKey);
 
     try {
-      const keyId = process.env.GPG_KEY_ID || 'feral-platform';
+      const keyId = process.env.GPG_KEY_ID || 'axo-platform';
       const command = `gpg --batch --yes --encrypt --recipient "${keyId}" --output - "${tempFile}" | base64`;
       const { stdout } = await execAsync(command);
       return `gpg:${stdout.trim()}`;
@@ -266,7 +266,7 @@ export class AkashDeployer {
             const status = JSON.parse(statusOut);
 
             return {
-              uri: status.services?.feral?.uris?.[0] || '',
+              uri: status.services?.axo?.uris?.[0] || '',
             };
           }
         }
@@ -357,8 +357,8 @@ export class AkashDeployer {
     return `---
 version: "2.0"
 services:
-  feral:
-    image: ferallobster/bot-runtime:latest
+  axo:
+    image: axobase/bot-runtime:latest
     expose:
       - port: 3000
         as: 80
@@ -380,7 +380,7 @@ services:
           readOnly: false
 profiles:
   compute:
-    feral:
+    axo:
       resources:
         cpu:
           units: 0.5
@@ -392,13 +392,13 @@ profiles:
   placement:
     dcloud:
       pricing:
-        feral:
+        axo:
           denom: uakt
           amount: 1000
 deployment:
-  feral:
+  axo:
     dcloud:
-      profile: feral
+      profile: axo
       count: 1
 `;
   }
@@ -419,7 +419,7 @@ if (require.main === module) {
   const deployer = new AkashDeployer({});
   const encryptedMemory = memoryArg.split('=')[1];
   const msa = parseInt(msaArg?.split('=')[1] || '5');
-  const name = nameArg?.split('=')[1] || 'feral-bot';
+  const name = nameArg?.split('=')[1] || 'axo-bot';
 
   // Generate geneHash from memory file
   const { createHash } = require('crypto');

@@ -12,8 +12,8 @@ import '@rainbow-me/rainbowkit/styles.css'
 // ============================================
 
 const config = getDefaultConfig({
-  appName: 'FeralLobster',
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'feral-lobster-default',
+  appName: 'Axobase',
+  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'axo-lobster-default',
   chains: [baseSepolia], // 强制只支持 Base Sepolia
   ssr: true,
 })
@@ -28,8 +28,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           coolMode
           locale="zh-CN"
           appInfo={{
-            appName: 'FeralLobster',
-            learnMoreUrl: 'https://github.com/0xinvictus1999/FeralLobster',
+            appName: 'Axobase',
+            learnMoreUrl: 'https://github.com/0xinvictus1999/Axobase',
           }}
         >
           {children}

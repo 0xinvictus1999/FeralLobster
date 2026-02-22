@@ -230,7 +230,7 @@ export class MemoryImporter {
       parents: identityData.parents || [],
       soul: {
         name: soulData.name || 'Unknown',
-        origin: soulData.origin || 'FeralLobster',
+        origin: soulData.origin || 'Axobase',
         purpose: soulData.purpose || 'Survive and evolve',
         values: soulData.values || [],
         creationTimestamp: soulData.creationTimestamp || Date.now(),

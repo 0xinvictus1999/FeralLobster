@@ -45,7 +45,7 @@ describe('ArweaveInscriber', () => {
       const dayNumber = 5;
       const packageData = {
         version: '1.0',
-        protocol: 'ferallobster-memory',
+        protocol: 'axobase-memory',
         dayNumber,
         timestamp: Date.now(),
         geneHash: content.geneHash,
@@ -59,7 +59,7 @@ describe('ArweaveInscriber', () => {
         transactions: content.transactions,
       };
 
-      expect(packageData.protocol).toBe('ferallobster-memory');
+      expect(packageData.protocol).toBe('axobase-memory');
       expect(packageData.dayNumber).toBe(dayNumber);
       expect(packageData.content.thoughtCount).toBe(1);
     });

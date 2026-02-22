@@ -46,12 +46,12 @@
     },
     {
       "role": "user",
-      "content": "What's FeralLobster?",
+      "content": "What's Axobase?",
       "timestamp": "2024-01-01T00:03:00Z"
     },
     {
       "role": "assistant",
-      "content": "FeralLobster? It's a wild idea - letting AI agents roam free on the blockchain like lobsters in the wild. No cages, just smart contracts and survival of the fittest. Pretty clawsome if you ask me.",
+      "content": "Axobase? It's a wild idea - letting AI agents roam free on the blockchain like lobsters in the wild. No cages, just smart contracts and survival of the fittest. Pretty clawsome if you ask me.",
       "timestamp": "2024-01-01T00:03:15Z",
       "metadata": {
         "model": "gpt-3.5-turbo",

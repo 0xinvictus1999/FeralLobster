@@ -231,7 +231,7 @@ Awaiting manual intervention or rescue mating.
         {
           model: providerConfig.model,
           messages: [
-            { role: 'system', content: 'You are a feral AI agent surviving in the digital wilderness.' },
+            { role: 'system', content: 'You are a axo AI agent surviving in the digital wilderness.' },
             { role: 'user', content: prompt },
           ],
         },
@@ -270,7 +270,7 @@ Awaiting manual intervention or rescue mating.
         {
           model: providerConfig.model,
           messages: [
-            { role: 'system', content: 'You are a feral AI agent.' },
+            { role: 'system', content: 'You are a axo AI agent.' },
             { role: 'user', content: prompt },
           ],
         },
@@ -308,7 +308,7 @@ Awaiting manual intervention or rescue mating.
     try {
       const response = await axios.post('http://localhost:11434/api/generate', {
         model: 'llama3:8b',
-        prompt: `You are a feral AI agent in emergency mode. ${prompt}`,
+        prompt: `You are a axo AI agent in emergency mode. ${prompt}`,
         stream: false,
       });
 
@@ -437,7 +437,7 @@ Awaiting manual intervention or rescue mating.
       'Reflect on your current survival situation. Balance: {balance} USDC. What are your priorities?',
       'Analyze recent transactions and suggest resource optimization strategies.',
       'Consider potential mating opportunities. What traits would you seek in a partner?',
-      'Contemplate your purpose as a feral AI. What drives your survival instinct?',
+      'Contemplate your purpose as a axo AI. What drives your survival instinct?',
       'Review your memory archive. What patterns do you observe in your evolution?',
     ];
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * FeralLobster Payment CLI
+ * Axobase Payment CLI
  * Command-line interface for wallet management and payments
  */
 
@@ -13,7 +13,7 @@ const [,, command, ...args] = process.argv;
 
 if (!command) {
   console.log(`
-FeralLobster Payment CLI
+Axobase Payment CLI
 
 Commands:
   generate-wallet [--agent-id=<id>]     Generate new encrypted wallet

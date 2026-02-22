@@ -1,8 +1,8 @@
 /**
- * FeralLobster X402 Payment System
+ * Axobase X402 Payment System
  * AI Agent Autonomous Payment Framework
  * 
- * @module @ferallobster/payment
+ * @module @axobase/payment
  */
 
 export { X402Client } from './X402Client';

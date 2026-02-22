@@ -22,7 +22,7 @@ export function Header() {
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-lg" />
             <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              FeralLobster
+              Axobase
             </span>
           </Link>
 
@@ -38,7 +38,7 @@ export function Header() {
               {t('nav.release')}
             </Link>
             <a 
-              href="https://github.com/0xinvictus1999/FeralLobster"
+              href="https://github.com/0xinvictus1999/Axobase"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-300 hover:text-white transition-colors"

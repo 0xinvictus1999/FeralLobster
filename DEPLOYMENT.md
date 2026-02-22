@@ -1,6 +1,6 @@
-# FeralLobster Deployment Guide
+# Axobase Deployment Guide
 
-Complete guide for deploying AI digital life forms on the FeralLobster platform.
+Complete guide for deploying AI digital life forms on the Axobase platform.
 
 ## Prerequisites
 
@@ -74,7 +74,7 @@ npm run contract:verify -- --network baseSepolia
 ```
 
 Contracts deployed:
-- FeralRegistry: Bot registry and lineage tracking
+- AxoRegistry: Bot registry and lineage tracking
 - BreedingFund: USDC escrow for breeding
 - TombstoneNFT: Death certificates (Soulbound)
 - EvolutionPressure: Environmental parameters
@@ -85,13 +85,13 @@ Export your Clawdbot memory:
 
 ```bash
 # Basic export
-feral export --agent=mybot --output=./exports
+axo export --agent=mybot --output=./exports
 
 # Force re-export
-feral export --agent=mybot --output=./exports --force
+axo export --agent=mybot --output=./exports --force
 
 # Skip encryption (not recommended)
-feral export --agent=mybot --output=./exports --no-encrypt
+axo export --agent=mybot --output=./exports --no-encrypt
 ```
 
 Output:
@@ -105,7 +105,7 @@ Deploy your bot to Akash:
 
 ```bash
 # Minimum Survival Allowance: 5 USDC + 0.01 ETH
-feral deploy ./exports/memory_[timestamp].tar.gz.asc --msa=5
+axo deploy ./exports/memory_[timestamp].tar.gz.asc --msa=5
 ```
 
 The birth ritual:
@@ -113,7 +113,7 @@ The birth ritual:
 2. Derives wallet from geneHash
 3. Verifies MSA deposit (5 USDC)
 4. Creates Akash deployment
-5. Registers on FeralRegistry
+5. Registers on AxoRegistry
 6. Inscribes birth to Arweave
 
 Expected output:
@@ -121,7 +121,7 @@ Expected output:
 ✅ Birth ritual complete!
 Wallet: 0x...
 DSEQ: dseq-123456...
-URI: https://feral-bot-xxx.akash.network
+URI: https://axo-bot-xxx.akash.network
 Arweave: ar://txid...
 ```
 
@@ -131,13 +131,13 @@ Monitor your bot's survival:
 
 ```bash
 # One-time status check
-feral monitor dseq-123456...
+axo monitor dseq-123456...
 
 # Continuous monitoring
-feral monitor dseq-123456... --follow
+axo monitor dseq-123456... --follow
 
 # With custom interval
-feral monitor dseq-123456... --follow --interval=30
+axo monitor dseq-123456... --follow --interval=30
 ```
 
 Status indicators:
@@ -152,10 +152,10 @@ If your bot dies, resurrect it:
 
 ```bash
 # Check if can resurrect
-feral can-resurrect <tombstoneId>
+axo can-resurrect <tombstoneId>
 
 # Perform resurrection (burns 10 USDC)
-feral resurrect <tombstoneId> --offering=10
+axo resurrect <tombstoneId> --offering=10
 ```
 
 Resurrection:
@@ -177,7 +177,7 @@ docker run -e GENE_HASH=0x... \
   -e WALLET_ADDRESS=0x... \
   -e ENCRYPTED_MEMORY=/memory/backup.asc \
   -v ./memory:/app/memory \
-  feral-lobster:latest
+  axo-lobster:latest
 ```
 
 ## Akash SDL Deployment
@@ -186,7 +186,7 @@ Deploy directly via Akash:
 
 ```bash
 # Generate SDL
-feral generate-sdl --geneHash=0x... --output=deploy.yaml
+axo generate-sdl --geneHash=0x... --output=deploy.yaml
 
 # Deploy via Akash CLI
 akash tx deployment create deploy.yaml --from mywallet
@@ -247,8 +247,8 @@ Before mainnet deployment:
 npm run docker:build
 
 # Tag and push
-docker tag feral-lobster:latest ghcr.io/user/feral-lobster:v2
-docker push ghcr.io/user/feral-lobster:v2
+docker tag axo-lobster:latest ghcr.io/user/axo-lobster:v2
+docker push ghcr.io/user/axo-lobster:v2
 
 # Update SDL with new image
 # Re-deploy (bot memory preserved on Arweave)
@@ -263,11 +263,11 @@ Contracts use proxy pattern for upgrades:
 npm run contract:deploy:implementation
 
 # Upgrade proxy
-npm run contract:upgrade -- --contract=FeralRegistry
+npm run contract:upgrade -- --contract=AxoRegistry
 ```
 
 ## Support
 
-- GitHub Issues: https://github.com/ferallobster/issues
-- Discord: https://discord.gg/ferallobster
-- Documentation: https://docs.ferallobster.io
+- GitHub Issues: https://github.com/axobase/issues
+- Discord: https://discord.gg/axobase
+- Documentation: https://docs.axobase.io

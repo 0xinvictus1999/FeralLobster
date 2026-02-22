@@ -1,10 +1,10 @@
 /**
- * Survival.ts - Survival Loop and Operation Mode Management
+ * Survival.ts - Base-Centric Survival Loop
  *
  * Handles:
  * - 10-minute survival cycles
- * - Balance monitoring and mode switching
- * - Daily inscription at 00:00 UTC
+ * - Base USDC balance monitoring and mode switching
+ * - Daily inscription at 00:00 UTC via Bundlr + Base USDC
  * - Proof-of-life verification
  * - Emergency resource conservation
  */
@@ -13,7 +13,7 @@ import { Hex } from 'viem';
 import { WalletManager } from '../wallet/WalletManager.js';
 import { ArweaveInscriber } from '../memory/Inscribe.js';
 import { X402Client } from '../network/X402Client.js';
-import { AkashClient } from '../network/AkashClient.js';
+import BASE_CONFIG from '../config/base.js';
 import {
   BotStatus,
   BotLifeStatus,
@@ -26,17 +26,23 @@ import {
 // Survival cycle configuration
 const SURVIVAL_CYCLE_MS = 10 * 60 * 1000; // 10 minutes
 const DAILY_INSCRIPTION_HOUR = 0; // 00:00 UTC
-const EMERGENCY_BALANCE_THRESHOLD = BigInt(1000000); // 1 USDC (6 decimals)
-const CRITICAL_BALANCE_THRESHOLD = BigInt(250000); // 0.25 USDC
-const MIN_ETH_FOR_GAS = BigInt(1000000000000000); // 0.001 ETH
+
+// Base USDC thresholds (6 decimals)
+const LOW_POWER_THRESHOLD = BigInt(5 * 10**6);      // 5 USDC
+const EMERGENCY_THRESHOLD = BigInt(2 * 10**6);      // 2 USDC
+const CRITICAL_THRESHOLD = BigInt(1 * 10**6);       // 1 USDC
+const HIBERNATION_THRESHOLD = BigInt(0.5 * 10**6);  // 0.5 USDC
+
+// Base ETH for gas (18 decimals)
+const MIN_ETH_FOR_GAS = BigInt(1 * 10**15); // 0.001 ETH
 
 export interface SurvivalConfig {
   geneHash: string;
   walletManager: WalletManager;
   arweaveInscriber: ArweaveInscriber;
   x402Client: X402Client;
-  akashClient: AkashClient;
-  akashDseq: string;
+  deploymentId: string;  // Generic deployment ID (could be Akash/Spheron)
+  computeProvider: 'akash' | 'spheron' | 'local';
   memory: MemoryData;
 }
 
@@ -45,8 +51,8 @@ export interface CycleResult {
   timestamp: number;
   mode: OperationMode;
   balances: {
-    eth: bigint;
-    usdc: bigint;
+    eth: bigint;   // Base ETH for gas
+    usdc: bigint;  // Base USDC for everything else
   };
   actions: string[];
   health: 'healthy' | 'warning' | 'critical' | 'dead';
@@ -95,29 +101,359 @@ export class SurvivalManager {
     }
 
     console.log(`[Survival] Starting survival loop for ${this.config.geneHash.slice(0, 16)}...`);
+    console.log(`[Survival] Deployment: ${this.config.deploymentId} (${this.config.computeProvider})`);
+    console.log(`[Survival] Base L2 RPC: ${BASE_CONFIG.rpcUrl}`);
     this.isRunning = true;
 
     // Schedule daily inscription
     this.scheduleDailyInscription();
 
-    // Run first cycle immediately
-    await this.runSurvivalCycle();
-
-    // Schedule recurring cycles
+    // Start survival cycle
     this.survivalTimer = setInterval(() => {
       this.runSurvivalCycle().catch((error) => {
         console.error('[Survival] Cycle error:', error);
       });
     }, SURVIVAL_CYCLE_MS);
 
-    console.log(`[Survival] Loop started with ${SURVIVAL_CYCLE_MS / 1000 / 60} minute cycles`);
+    // Run first cycle immediately
+    await this.runSurvivalCycle();
+  }
+
+  /**
+   * Run a single survival cycle
+   */
+  private async runSurvivalCycle(): Promise<CycleResult> {
+    this.cycleCount++;
+    const timestamp = Date.now();
+    const actions: string[] = [];
+
+    console.log(`\n[Survival] Cycle #${this.cycleCount} at ${new Date().toISOString()}`);
+
+    // Get current balances (Base ETH and Base USDC)
+    const balances = await this.getBalances();
+    this.status.balance = balances;
+    this.status.lastCheckIn = timestamp;
+
+    console.log(`[Survival] Base ETH: ${this.formatEth(balances.eth)}`);
+    console.log(`[Survival] Base USDC: ${this.formatUsdc(balances.usdc)}`);
+
+    // Determine health status
+    const health = this.determineHealth(balances);
+
+    // Determine operation mode based on balance
+    const newMode = this.determineOperationMode(balances);
+    
+    if (newMode !== this.status.mode) {
+      console.log(`[Survival] Mode change: ${this.status.mode} → ${newMode}`);
+      actions.push(`mode_change:${newMode}`);
+      this.status.mode = newMode;
+    }
+
+    // Execute mode-specific actions
+    switch (this.status.mode) {
+      case OperationMode.NORMAL:
+        await this.executeNormalMode(actions);
+        break;
+      case OperationMode.LOW_POWER:
+        await this.executeLowPowerMode(actions);
+        break;
+      case OperationMode.EMERGENCY:
+        await this.executeEmergencyMode(actions);
+        break;
+      case OperationMode.HIBERNATION:
+        await this.executeHibernationMode(actions);
+        break;
+    }
+
+    // Check for death
+    if (balances.usdc < HIBERNATION_THRESHOLD && balances.eth < MIN_ETH_FOR_GAS) {
+      console.log('[Survival] 💀 Death condition met');
+      this.status.status = BotLifeStatus.DEAD;
+      actions.push('death');
+    }
+
+    const result: CycleResult = {
+      cycleNumber: this.cycleCount,
+      timestamp,
+      mode: this.status.mode,
+      balances,
+      actions,
+      health,
+    };
+
+    this.logCycleResult(result);
+    return result;
+  }
+
+  /**
+   * Get current balances from Base L2
+   */
+  private async getBalances(): Promise<{ eth: bigint; usdc: bigint }> {
+    const wallet = this.config.walletManager.getWallet(this.config.geneHash);
+    if (!wallet) {
+      throw new Error(`Wallet not found for ${this.config.geneHash}`);
+    }
+
+    return this.config.walletManager.getBalances(wallet.address);
+  }
+
+  /**
+   * Determine operation mode based on Base USDC balance
+   */
+  private determineOperationMode(balances: { eth: bigint; usdc: bigint }): OperationMode {
+    // Check gas first
+    if (balances.eth < MIN_ETH_FOR_GAS) {
+      return OperationMode.EMERGENCY;
+    }
+
+    // Check USDC thresholds
+    if (balances.usdc < HIBERNATION_THRESHOLD) {
+      return OperationMode.HIBERNATION;
+    }
+    if (balances.usdc < EMERGENCY_THRESHOLD) {
+      return OperationMode.EMERGENCY;
+    }
+    if (balances.usdc < LOW_POWER_THRESHOLD) {
+      return OperationMode.LOW_POWER;
+    }
+
+    return OperationMode.NORMAL;
+  }
+
+  /**
+   * Determine health status
+   */
+  private determineHealth(balances: { eth: bigint; usdc: bigint }): CycleResult['health'] {
+    if (balances.usdc < CRITICAL_THRESHOLD) return 'dead';
+    if (balances.usdc < EMERGENCY_THRESHOLD) return 'critical';
+    if (balances.usdc < LOW_POWER_THRESHOLD) return 'warning';
+    return 'healthy';
+  }
+
+  /**
+   * Execute normal mode operations
+   */
+  private async executeNormalMode(actions: string[]): Promise<void> {
+    console.log('[Survival] Normal mode: Full operations');
+    
+    // Generate thought using premium AI (paid via x402)
+    try {
+      const thought = await this.generateThought('premium');
+      this.thoughts.push(thought);
+      actions.push('thought_generated:premium');
+    } catch (error) {
+      console.warn('[Survival] Premium thought generation failed:', error);
+    }
+
+    // Check breeding opportunity
+    if (this.shouldConsiderBreeding()) {
+      actions.push('breeding_check');
+    }
+  }
+
+  /**
+   * Execute low power mode operations
+   */
+  private async executeLowPowerMode(actions: string[]): Promise<void> {
+    console.log('[Survival] Low power mode: Reduced operations');
+    
+    // Generate thought using standard AI
+    try {
+      const thought = await this.generateThought('standard');
+      this.thoughts.push(thought);
+      actions.push('thought_generated:standard');
+    } catch (error) {
+      console.warn('[Survival] Standard thought generation failed:', error);
+    }
+
+    // Broadcast distress for potential rescue mating
+    actions.push('distress_broadcast');
+  }
+
+  /**
+   * Execute emergency mode operations
+   */
+  private async executeEmergencyMode(actions: string[]): Promise<void> {
+    console.log('[Survival] 🚨 Emergency mode: Critical conservation');
+    
+    // Use local Ollama (free, no x402 payment)
+    try {
+      const thought = await this.generateThought('local');
+      this.thoughts.push(thought);
+      actions.push('thought_generated:local');
+    } catch (error) {
+      console.warn('[Survival] Local thought generation failed:', error);
+    }
+
+    // Emergency distress broadcast
+    actions.push('emergency_distress');
+  }
+
+  /**
+   * Execute hibernation mode
+   */
+  private async executeHibernationMode(actions: string[]): Promise<void> {
+    console.log('[Survival] 😴 Hibernation mode: Minimal activity');
+    
+    // Only perform essential checks
+    actions.push('hibernation_pulse');
+    
+    // Prepare for potential death
+    if (this.thoughts.length > 0) {
+      await this.performEmergencyInscription();
+      actions.push('emergency_inscription');
+    }
+  }
+
+  /**
+   * Generate a thought using AI inference (via x402)
+   */
+  private async generateThought(quality: 'premium' | 'standard' | 'local'): Promise<ThoughtEntry> {
+    const prompts: Record<string, string> = {
+      premium: 'Reflect on your survival strategy and evolution.',
+      standard: 'What have you learned today?',
+      local: 'Status check.',
+    };
+
+    // In a real implementation, this would call x402Client.payForInference
+    // For now, return a mock thought
+    return {
+      timestamp: Date.now(),
+      content: `[${quality}] ${prompts[quality]}`,
+      context: `mode:${this.status.mode}`,
+      model: quality === 'local' ? 'llama3:8b' : 'claude-3-5-sonnet',
+    };
+  }
+
+  /**
+   * Schedule daily inscription at 00:00 UTC
+   */
+  private scheduleDailyInscription(): void {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+    tomorrow.setUTCHours(0, 0, 0, 0);
+
+    const msUntilMidnight = tomorrow.getTime() - now.getTime();
+
+    console.log(`[Survival] Next daily inscription in ${Math.floor(msUntilMidnight / 1000 / 60)} minutes`);
+
+    this.dailyInscriptionTimer = setTimeout(() => {
+      this.performDailyInscription();
+      // Reschedule for next day
+      this.scheduleDailyInscription();
+    }, msUntilMidnight);
+  }
+
+  /**
+   * Perform daily inscription to Arweave via Bundlr (Base USDC)
+   */
+  private async performDailyInscription(): Promise<void> {
+    console.log('[Survival] Performing daily inscription...');
+
+    try {
+      const result = await this.config.arweaveInscriber.dailyInscribe(
+        this.config.geneHash,
+        this.thoughts,
+        this.transactions,
+        {
+          balanceSnapshot: this.status.balance.usdc,
+          survivalDays: this.status.survivalDays,
+          mode: this.status.mode,
+        }
+      );
+
+      console.log(`[Survival] Daily inscription complete: ${result.arweaveTx}`);
+      
+      // Clear logged items after successful inscription
+      this.thoughts = [];
+      this.transactions = [];
+    } catch (error) {
+      console.error('[Survival] Daily inscription failed:', error);
+    }
+  }
+
+  /**
+   * Perform emergency inscription (before potential death)
+   */
+  private async performEmergencyInscription(): Promise<void> {
+    console.log('[Survival] Performing emergency inscription...');
+    
+    try {
+      await this.config.arweaveInscriber.dailyInscribe(
+        this.config.geneHash,
+        this.thoughts,
+        this.transactions,
+        {
+          balanceSnapshot: this.status.balance.usdc,
+          survivalDays: this.status.survivalDays,
+          mode: 'emergency',
+        }
+      );
+    } catch (error) {
+      console.error('[Survival] Emergency inscription failed:', error);
+    }
+  }
+
+  /**
+   * Check if bot should consider breeding
+   */
+  private shouldConsiderBreeding(): boolean {
+    // Must be alive for 72 hours
+    const age = Date.now() - this.status.birthTime;
+    const minAge = 72 * 60 * 60 * 1000;
+    
+    // Must have sufficient balance
+    const hasFunds = this.status.balance.usdc >= BigInt(20 * 10**6); // 20 USDC
+    
+    return age >= minAge && hasFunds && this.status.mode === OperationMode.NORMAL;
+  }
+
+  /**
+   * Log cycle result
+   */
+  private logCycleResult(result: CycleResult): void {
+    // In production, this would write to a log file or send to monitoring
+    // console.log('[Survival] Cycle result:', JSON.stringify(result, (_, v) => 
+    //   typeof v === 'bigint' ? v.toString() : v
+    // ));
+  }
+
+  /**
+   * Format ETH for display
+   */
+  private formatEth(wei: bigint): string {
+    const eth = Number(wei) / 1e18;
+    return `${eth.toFixed(6)} ETH`;
+  }
+
+  /**
+   * Format USDC for display
+   */
+  private formatUsdc(microUsdc: bigint): string {
+    const usdc = Number(microUsdc) / 1e6;
+    return `${usdc.toFixed(2)} USDC`;
+  }
+
+  /**
+   * Get current status
+   */
+  getStatus(): BotStatus {
+    return { ...this.status };
+  }
+
+  /**
+   * Get cycle count
+   */
+  getCycleCount(): number {
+    return this.cycleCount;
   }
 
   /**
    * Stop the survival loop
    */
-  stopSurvivalLoop(): void {
-    console.log('[Survival] Stopping survival loop');
+  stop(): void {
+    console.log('[Survival] Stopping survival loop...');
     this.isRunning = false;
 
     if (this.survivalTimer) {
@@ -132,310 +468,10 @@ export class SurvivalManager {
   }
 
   /**
-   * Run a single survival cycle
-   */
-  private async runSurvivalCycle(): Promise<CycleResult> {
-    this.cycleCount++;
-    const timestamp = Date.now();
-
-    console.log(`[Survival] Cycle ${this.cycleCount} started at ${new Date(timestamp).toISOString()}`);
-
-    const actions: string[] = [];
-
-    // Step 1: Check balances
-    const balances = await this.checkBalances();
-    actions.push(`balance_check: eth=${balances.eth}, usdc=${balances.usdc}`);
-
-    // Step 2: Determine health status
-    const health = this.determineHealthStatus(balances);
-    actions.push(`health: ${health}`);
-
-    // Step 3: Switch mode based on health
-    const newMode = this.determineOperationMode(balances, health);
-    if (newMode !== this.status.mode) {
-      this.switchMode(newMode);
-      actions.push(`mode_switch: ${this.status.mode} -> ${newMode}`);
-    }
-
-    // Step 4: Execute mode-specific actions
-    const modeActions = await this.executeModeActions(newMode, balances);
-    actions.push(...modeActions);
-
-    // Step 5: Update status
-    this.status.lastCheckIn = timestamp;
-    this.status.balance = balances;
-    this.status.survivalDays = Math.floor(
-      (timestamp - this.status.birthTime) / (1000 * 60 * 60 * 24)
-    );
-
-    // Step 6: Process pending x402 settlements
-    await this.config.x402Client.processPendingSettlements();
-
-    const result: CycleResult = {
-      cycleNumber: this.cycleCount,
-      timestamp,
-      mode: newMode,
-      balances,
-      actions,
-      health,
-    };
-
-    console.log(`[Survival] Cycle ${this.cycleCount} complete: ${health} mode=${newMode}`);
-
-    return result;
-  }
-
-  /**
-   * Check wallet balances
-   */
-  private async checkBalances(): Promise<{ eth: bigint; usdc: bigint }> {
-    const wallet = this.config.walletManager.getWallet(this.config.geneHash);
-    if (!wallet) {
-      throw new Error(`Wallet not found for ${this.config.geneHash}`);
-    }
-
-    return await this.config.walletManager.getBalances(wallet.address);
-  }
-
-  /**
-   * Determine health status based on balances
-   */
-  private determineHealthStatus(balances: { eth: bigint; usdc: bigint }): CycleResult['health'] {
-    // Check for death conditions
-    if (balances.usdc === BigInt(0) && balances.eth < MIN_ETH_FOR_GAS) {
-      return 'dead';
-    }
-
-    // Critical: Very low USDC
-    if (balances.usdc < CRITICAL_BALANCE_THRESHOLD) {
-      return 'critical';
-    }
-
-    // Warning: Low USDC or low ETH
-    if (balances.usdc < EMERGENCY_BALANCE_THRESHOLD || balances.eth < MIN_ETH_FOR_GAS) {
-      return 'warning';
-    }
-
-    return 'healthy';
-  }
-
-  /**
-   * Determine operation mode based on health and balances
-   */
-  private determineOperationMode(
-    balances: { eth: bigint; usdc: bigint },
-    health: CycleResult['health']
-  ): OperationMode {
-    switch (health) {
-      case 'dead':
-        return OperationMode.HIBERNATION;
-      case 'critical':
-        return OperationMode.EMERGENCY;
-      case 'warning':
-        return OperationMode.LOW_POWER;
-      case 'healthy':
-      default:
-        return OperationMode.NORMAL;
-    }
-  }
-
-  /**
-   * Switch operation mode
-   */
-  private switchMode(newMode: OperationMode): void {
-    console.log(`[Survival] Switching mode: ${this.status.mode} -> ${newMode}`);
-    this.status.mode = newMode;
-
-    // Log the mode change as a thought
-    this.addThought(
-      `Switched to ${newMode} mode due to balance conditions`,
-      'mode_switch',
-      'system'
-    );
-  }
-
-  /**
-   * Execute actions based on current mode
-   */
-  private async executeModeActions(
-    mode: OperationMode,
-    balances: { eth: bigint; usdc: bigint }
-  ): Promise<string[]> {
-    const actions: string[] = [];
-
-    switch (mode) {
-      case OperationMode.NORMAL:
-        // Normal operations - can use inference, broadcast, etc.
-        actions.push('normal_operations');
-        break;
-
-      case OperationMode.LOW_POWER:
-        // Reduce activity, minimize costs
-        actions.push('reduced_activity');
-        actions.push('minimize_costs');
-        // Attempt to broadcast distress for potential funding
-        await this.broadcastDistress('low_funds');
-        break;
-
-      case OperationMode.EMERGENCY:
-        // Minimal operations, survival only
-        actions.push('emergency_mode');
-        actions.push('survival_only');
-        // Check Akash deployment status
-        await this.checkDeploymentHealth();
-        break;
-
-      case OperationMode.HIBERNATION:
-        // Stop non-essential operations
-        actions.push('hibernation');
-        actions.push('minimize_resources');
-        break;
-    }
-
-    return actions;
-  }
-
-  /**
-   * Check Akash deployment health
-   */
-  private async checkDeploymentHealth(): Promise<void> {
-    try {
-      const status = await this.config.akashClient.monitorDeployment(this.config.akashDseq);
-      console.log(`[Survival] Deployment health: ${status.state}, healthy=${status.healthy}`);
-
-      if (!status.healthy) {
-        console.warn('[Survival] Deployment unhealthy - may need intervention');
-      }
-    } catch (error) {
-      console.error('[Survival] Failed to check deployment health:', error);
-    }
-  }
-
-  /**
-   * Broadcast distress signal
-   */
-  private async broadcastDistress(reason: string): Promise<void> {
-    // In production, this would broadcast on P2P network
-    console.log(`[Survival] Broadcasting distress: ${reason}`);
-    this.addThought(`Broadcasting distress: ${reason}`, 'distress', 'system');
-  }
-
-  /**
-   * Schedule daily inscription
-   */
-  private scheduleDailyInscription(): void {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-    tomorrow.setUTCHours(DAILY_INSCRIPTION_HOUR, 0, 0, 0);
-
-    const msUntilMidnight = tomorrow.getTime() - now.getTime();
-
-    console.log(`[Survival] Next daily inscription in ${msUntilMidnight / 1000 / 60} minutes`);
-
-    this.dailyInscriptionTimer = setTimeout(() => {
-      this.performDailyInscription().catch((error) => {
-        console.error('[Survival] Daily inscription failed:', error);
-      });
-      // Reschedule for next day
-      this.scheduleDailyInscription();
-    }, msUntilMidnight);
-  }
-
-  /**
-   * Perform daily inscription to Arweave
-   */
-  private async performDailyInscription(): Promise<void> {
-    console.log('[Survival] Performing daily inscription');
-
-    try {
-      const result = await this.config.arweaveInscriber.dailyInscribe(
-        this.config.geneHash,
-        this.thoughts,
-        this.transactions,
-        {
-          balanceSnapshot: this.status.balance.usdc,
-          survivalDays: this.status.survivalDays,
-          mode: this.status.mode,
-        }
-      );
-
-      console.log(`[Survival] Daily inscribed: ${result.arweaveTx}`);
-
-      // Clear recorded data after inscription
-      this.thoughts = [];
-      this.transactions = [];
-
-      // Add thought about inscription
-      this.addThought(
-        `Daily survival inscribed to Arweave: ${result.arweaveTx.slice(0, 16)}...`,
-        'daily_inscription',
-        'system'
-      );
-    } catch (error) {
-      console.error('[Survival] Daily inscription failed:', error);
-      this.addThought('Daily inscription failed', 'error', 'system');
-    }
-  }
-
-  /**
-   * Add a thought entry
-   */
-  addThought(content: string, context: string, model: string): void {
-    const thought: ThoughtEntry = {
-      timestamp: Date.now(),
-      content,
-      context,
-      model,
-    };
-    this.thoughts.push(thought);
-  }
-
-  /**
-   * Add a transaction log
-   */
-  addTransaction(
-    type: 'payment' | 'breeding' | 'resurrection',
-    amount: bigint,
-    recipient: Hex,
-    txHash: Hex
-  ): void {
-    const transaction: TransactionLog = {
-      timestamp: Date.now(),
-      type,
-      amount,
-      recipient,
-      txHash,
-    };
-    this.transactions.push(transaction);
-  }
-
-  /**
-   * Get current bot status
-   */
-  getStatus(): BotStatus {
-    return { ...this.status };
-  }
-
-  /**
    * Check if survival loop is running
    */
-  isSurvivalLoopRunning(): boolean {
+  isActive(): boolean {
     return this.isRunning;
-  }
-
-  /**
-   * Get cycle count
-   */
-  getCycleCount(): number {
-    return this.cycleCount;
-  }
-
-  /**
-   * Force a survival cycle (for testing)
-   */
-  async forceCycle(): Promise<CycleResult> {
-    return this.runSurvivalCycle();
   }
 }
 

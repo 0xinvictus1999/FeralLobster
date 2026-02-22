@@ -1,5 +1,5 @@
 #!/bin/sh
-# FeralLobster Docker Entrypoint
+# Axobase Docker Entrypoint
 # Handles initialization and graceful shutdown
 
 set -e
@@ -11,7 +11,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 echo "═══════════════════════════════════════════════════"
-echo "🦞 FeralLobster Bot Runtime"
+echo "🦞 Axobase Bot Runtime"
 echo "═══════════════════════════════════════════════════"
 echo ""
 

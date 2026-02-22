@@ -218,7 +218,7 @@ export class MemoryBlender {
   private blendSoul(soulA: any, soulB: any, weightA: number, weightB: number): any {
     return {
       name: `Child of ${soulA.name} and ${soulB.name}`,
-      origin: 'FeralLobster Evolution',
+      origin: 'Axobase Evolution',
       purpose: Math.random() < weightA ? soulA.purpose : soulB.purpose,
       values: [...new Set([...soulA.values, ...soulB.values])].slice(0, 5),
       creationTimestamp: Date.now(),
@@ -254,7 +254,7 @@ export class MemoryBlender {
 
     // Would need access to registry to check ancestry
     // For now, implement basic check
-    // In production, this would query the FeralRegistry contract
+    // In production, this would query the AxoRegistry contract
 
     // Simple heuristic: check if hashes share significant prefix
     // This is a placeholder - real implementation needs registry access

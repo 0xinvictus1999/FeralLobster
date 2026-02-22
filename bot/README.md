@@ -1,6 +1,6 @@
 # 🤖 Telegram Bot
 
-FeralLobster 放养平台 - Telegram 交互入口
+Axobase 放养平台 - Telegram 交互入口
 
 ## ⚠️ 网络声明
 

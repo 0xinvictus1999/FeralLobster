@@ -1,6 +1,6 @@
 # WSL2 配置指南
 
-在 Windows 上使用 WSL2 (Windows Subsystem for Linux) 运行 FeralLobster 项目。
+在 Windows 上使用 WSL2 (Windows Subsystem for Linux) 运行 Axobase 项目。
 
 ---
 
@@ -56,7 +56,7 @@ wsl --set-default-version 2
 
 ```bash
 # 设置用户名
-Enter new UNIX username: ferallobster
+Enter new UNIX username: axobase
 
 # 设置密码
 New password: [输入密码]
@@ -165,7 +165,7 @@ docker run hello-world
 
 ---
 
-## 7️⃣ 配置 FeralLobster 项目
+## 7️⃣ 配置 Axobase 项目
 
 ### 克隆项目
 
@@ -174,8 +174,8 @@ docker run hello-world
 cd ~
 
 # 克隆项目
-git clone https://github.com/0xinvictus1999/FeralLobster.git
-cd FeralLobster
+git clone https://github.com/0xinvictus1999/Axobase.git
+cd Axobase
 ```
 
 ### 访问 Windows 文件（可选）
@@ -194,7 +194,7 @@ cd /mnt/c/Users/$USER/Desktop
 
 ```bash
 # 1. 安装合约依赖
-cd ~/FeralLobster/contracts
+cd ~/Axobase/contracts
 forge install
 
 # 2. 编译合约
@@ -217,7 +217,7 @@ Windows 端安装 [VS Code](https://code.visualstudio.com/)
 1. 打开 VS Code
 2. 安装 "Remote - WSL" 扩展
 3. 按 `Ctrl+Shift+P`，输入 "WSL: Connect to WSL"
-4. 打开 `~/FeralLobster` 文件夹
+4. 打开 `~/Axobase` 文件夹
 
 ### 配置 Solidity 支持
 
@@ -259,7 +259,7 @@ wsl -d Ubuntu
 # WSL Ubuntu 中运行
 
 # 编译合约
-cd ~/FeralLobster/contracts
+cd ~/Axobase/contracts
 forge build
 
 # 运行测试
@@ -271,7 +271,7 @@ forge script script/Deploy.s.sol \
   --broadcast
 
 # 启动 Docker 服务
-cd ~/FeralLobster
+cd ~/Axobase
 docker-compose up --build
 ```
 
@@ -338,8 +338,8 @@ foundryup
 
 - [WSL 官方文档](https://docs.microsoft.com/windows/wsl/)
 - [Foundry 文档](https://book.getfoundry.sh/)
-- [FeralLobster GitHub](https://github.com/0xinvictus1999/FeralLobster)
+- [Axobase GitHub](https://github.com/0xinvictus1999/Axobase)
 
 ---
 
-**现在您可以在 WSL2 中完整运行 FeralLobster 项目了！**
+**现在您可以在 WSL2 中完整运行 Axobase 项目了！**

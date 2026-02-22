@@ -1,4 +1,4 @@
-# 🧪 FeralLobster 测试指南
+# 🧪 Axobase 测试指南
 
 > ⚠️ **WARNING: BASE SEPOLIA TESTNET ONLY**
 > 
@@ -28,11 +28,11 @@
 docker-compose ps
 
 # 应显示以下容器运行中:
-# - feral_postgres
-# - feral_redis
-# - feral_orchestrator
-# - feral_bot
-# - feral_web
+# - axo_postgres
+# - axo_redis
+# - axo_orchestrator
+# - axo_bot
+# - axo_web
 ```
 
 ### 2. 测试账号准备
@@ -301,7 +301,7 @@ docker-compose up --build
 4. **Akash 日志** (如果配置):
    ```
    Deployment created: id=123
-   URI: https://feral-bot-xxx.dcloud.app
+   URI: https://axo-bot-xxx.dcloud.app
    ```
 
 ---

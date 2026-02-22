@@ -2,11 +2,11 @@
 pragma solidity ^0.8.19;
 
 import "forge-std/Script.sol";
-import "../src/FeralRite.sol";
+import "../src/AxoRite.sol";
 
 /**
  * @title Deploy
- * @dev FeralRite 合约部署脚本
+ * @dev AxoRite 合约部署脚本
  * @notice 部署到 Base Sepolia 测试网
  * 
  * 使用方法:
@@ -30,7 +30,7 @@ contract Deploy is Script {
         address platformAddress = vm.envOr("PLATFORM_ADDRESS", deployer);
         
         console.log("========================================");
-        console.log("FeralRite Contract Deployment");
+        console.log("AxoRite Contract Deployment");
         console.log("========================================");
         console.log("Deployer:", deployer);
         console.log("Platform Address:", platformAddress);
@@ -54,7 +54,7 @@ contract Deploy is Script {
         vm.startBroadcast(deployerPrivateKey);
         
         // 部署合约
-        FeralRite feralRite = new FeralRite(platformAddress);
+        AxoRite feralRite = new AxoRite(platformAddress);
         
         vm.stopBroadcast();
         
@@ -85,7 +85,7 @@ contract Deploy is Script {
     ) internal {
         string memory deploymentInfo = string.concat(
             "{\n",
-            '  "contract": "FeralRite",', "\n",
+            '  "contract": "AxoRite",', "\n",
             '  "chainId": ', vm.toString(block.chainid), ",\n",
             '  "chainName": "Base Sepolia",', "\n",
             '  "contractAddress": "', vm.toString(contractAddress), '",', "\n",
@@ -116,7 +116,7 @@ contract Deploy is Script {
     /**
      * @dev 验证部署结果
      */
-    function _verifyDeployment(FeralRite feralRite) internal view {
+    function _verifyDeployment(AxoRite feralRite) internal view {
         console.log("\n--- Deployment Verification ---");
         
         // 验证 USDC 地址

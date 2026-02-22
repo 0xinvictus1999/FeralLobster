@@ -281,7 +281,7 @@ export class ReincarnationManager {
         parents: data.parents || [],
         soul: data.soul || {
           name: 'Unknown',
-          origin: 'FeralLobster',
+          origin: 'Axobase',
           purpose: 'Survive and evolve',
           values: [],
           creationTimestamp: Date.now(),
@@ -422,7 +422,7 @@ export class ReincarnationManager {
     tombstoneId: bigint,
     oldGeneHash: string
   ): Promise<Hex> {
-    // In production, this would call the FeralRegistry contract
+    // In production, this would call the AxoRegistry contract
     if (process.env.NODE_ENV === 'test' || process.env.MOCK_REGISTRY) {
       return `0x${'0'.repeat(64)}` as Hex;
     }

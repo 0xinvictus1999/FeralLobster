@@ -1,6 +1,6 @@
 /**
  * x402 Payment System Types
- * FeralLobster - AI Agent Autonomous Payment Framework
+ * Axobase - AI Agent Autonomous Payment Framework
  */
 
 import { Hex } from 'viem';

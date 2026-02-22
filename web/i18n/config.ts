@@ -1,6 +1,6 @@
 /**
  * i18n Configuration
- * Multi-language support for FeralLobster frontend
+ * Multi-language support for Axobase frontend
  * Default: English
  * Supported: English (en), Chinese (zh)
  */

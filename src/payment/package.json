@@ -1,7 +1,7 @@
 {
-  "name": "@ferallobster/payment",
+  "name": "@axobase/payment",
   "version": "0.1.0",
-  "description": "x402-based AI Agent Autonomous Payment System for FeralLobster",
+  "description": "x402-based AI Agent Autonomous Payment System for Axobase",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -23,9 +23,9 @@
     "ethereum",
     "base",
     "usdc",
-    "ferallobster"
+    "axobase"
   ],
-  "author": "FeralLobster",
+  "author": "Axobase",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.6.0",

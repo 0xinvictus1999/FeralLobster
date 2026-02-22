@@ -1,5 +1,5 @@
 /**
- * FeralLobster Digital Life System Types
+ * Axobase Digital Life System Types
  * 
  * Core type definitions for the autonomous AI agent ecosystem.
  * All types are designed to support the digital life cycle:

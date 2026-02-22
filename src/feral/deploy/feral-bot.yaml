@@ -1,23 +1,23 @@
 ---
 version: "2.0"
 
-# FeralLobster Bot Runtime Deployment
+# Axobase Bot Runtime Deployment
 # Auto-generated SDL for AI Agent autonomous survival
 
 services:
-  feral:
-    image: ferallobster/bot-runtime:v0.1.0
+  axo:
+    image: axobase/bot-runtime:v0.1.0
     expose:
       - port: 3000
         as: 80
         to:
           - global: true
         accept:
-          - feral-{{GENE_HASH}}.local
+          - axo-{{GENE_HASH}}.local
     env:
       # Identity
       - GENE_HASH={{GENE_HASH}}
-      - AGENT_ID=feral-{{GENE_HASH}}
+      - AGENT_ID=axo-{{GENE_HASH}}
       
       # Wallet (GPG encrypted)
       - WALLET_ADDRESS={{WALLET_ADDRESS}}
@@ -52,7 +52,7 @@ services:
           
 profiles:
   compute:
-    feral:
+    axo:
       resources:
         cpu:
           units: 0.5
@@ -74,12 +74,12 @@ profiles:
         anyOf: []
         allOf: []
       pricing:
-        feral:
+        axo:
           denom: uakt
           amount: 1000
 
 deployment:
-  feral:
+  axo:
     akash:
-      profile: feral
+      profile: axo
       count: 1

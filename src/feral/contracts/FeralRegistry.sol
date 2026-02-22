@@ -2,10 +2,10 @@
 pragma solidity ^0.8.19;
 
 /**
- * @title FeralRegistry
- * @dev Registry for all FeralLobster AI agents
+ * @title AxoRegistry
+ * @dev Registry for all Axobase AI agents
  */
-contract FeralRegistry {
+contract AxoRegistry {
     
     enum AgentStatus { Pending, Active, Dead }
     

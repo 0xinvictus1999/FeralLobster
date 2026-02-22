@@ -216,7 +216,7 @@ export class ArweaveInscriber {
   ): Promise<Buffer> {
     const packageData = {
       version: '1.0',
-      protocol: 'ferallobster-memory',
+      protocol: 'axobase-memory',
       dayNumber,
       timestamp: Date.now(),
       geneHash: content.geneHash,
@@ -253,7 +253,7 @@ export class ArweaveInscriber {
     // Upload
     const tags = [
       { name: 'Content-Type', value: 'application/json' },
-      { name: 'Protocol', value: 'ferallobster-memory' },
+      { name: 'Protocol', value: 'axobase-memory' },
       { name: 'Gene-Hash', value: process.env.GENE_HASH || 'unknown' },
     ];
 

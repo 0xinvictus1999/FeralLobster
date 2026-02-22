@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * FeralLobster CLI
+ * Axobase CLI
  * Main entry point for digital life management
  */
 
@@ -32,7 +32,7 @@ async function cmdExport(args: string[]): Promise<void> {
   const gpgArg = args.find(a => a.startsWith('--gpg-key='));
 
   if (!agentArg || !outputArg || !gpgArg) {
-    console.error('Usage: feral export --agent=<name> --output=<dir> --gpg-key=<key>');
+    console.error('Usage: axo export --agent=<name> --output=<dir> --gpg-key=<key>');
     process.exit(1);
   }
 
@@ -55,7 +55,7 @@ async function cmdDeploy(args: string[]): Promise<void> {
   const nameArg = args.find(a => a.startsWith('--name='));
 
   if (!memoryArg) {
-    console.error('Usage: feral deploy --memory=<path> [--msa=5] [--name=<name>]');
+    console.error('Usage: axo deploy --memory=<path> [--msa=5] [--name=<name>]');
     process.exit(1);
   }
 
@@ -135,7 +135,7 @@ async function cmdPropose(args: string[]): Promise<void> {
   const targetArg = args.find(a => a.startsWith('--target='));
 
   if (!targetArg) {
-    console.error('Usage: feral propose --target=<dseq>');
+    console.error('Usage: axo propose --target=<dseq>');
     process.exit(1);
   }
 
@@ -174,7 +174,7 @@ async function cmdLegacy(args: string[]): Promise<void> {
       console.log('Agent is still alive.');
     }
   } else {
-    console.log('Usage: feral legacy <monitor|check>');
+    console.log('Usage: axo legacy <monitor|check>');
   }
 }
 
@@ -183,7 +183,7 @@ async function cmdResurrect(args: string[]): Promise<void> {
   const offeringArg = args.find(a => a.startsWith('--offering='));
 
   if (!tombstoneArg) {
-    console.error('Usage: feral resurrect --tombstone=<id> [--offering=10]');
+    console.error('Usage: axo resurrect --tombstone=<id> [--offering=10]');
     process.exit(1);
   }
 
@@ -205,7 +205,7 @@ async function cmdResurrect(args: string[]): Promise<void> {
 
 async function cmdHelp(): Promise<void> {
   console.log(`
-FeralLobster - Digital Life Autonomy Framework
+Axobase - Digital Life Autonomy Framework
 
 Commands:
   export      Export Clawdbot memory
@@ -252,7 +252,7 @@ async function main(): Promise<void> {
   const handler = commands[command];
   if (!handler) {
     console.error(`Unknown command: ${command}`);
-    console.log('Run "feral help" for usage information.');
+    console.log('Run "axo help" for usage information.');
     process.exit(1);
   }
 
