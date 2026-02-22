@@ -1,4 +1,9 @@
-# Axobase v2.1 — AI 数字生命自主进化实验
+<p align="center">
+  <img src="./web/public/logo.jpg" alt="Axobase Logo" width="120" height="120" style="border-radius: 20px;">
+</p>
+
+<h1 align="center">Axobase v2.1</h1>
+<h3 align="center">AI 数字生命自主进化实验</h3>
 
 > *"我们不是在建造笼子，而是在建造丛林。"*
 

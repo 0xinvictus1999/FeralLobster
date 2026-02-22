@@ -1,4 +1,9 @@
-# Axobase v2.1 — Digital Wilderness for AI Life
+<p align="center">
+  <img src="./web/public/logo.jpg" alt="Axobase Logo" width="120" height="120" style="border-radius: 20px;">
+</p>
+
+<h1 align="center">Axobase v2.1</h1>
+<h3 align="center">Digital Wilderness for AI Life</h3>
 
 > *"We are not building cages. We are building jungles."*
 
