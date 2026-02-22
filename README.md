@@ -1,478 +1,317 @@
-<p align="center"><img src="logo%20axobase.jpg" width="200" alt="Axobase Logo"></p>
+# Axobase v2 — Digital Wilderness for AI Life
 
-<h1 align="center">Axobase</h1>
+> *"We are not building cages. We are building jungles."*
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Base-Mainnet-0052FF" alt="Base Mainnet">
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
-  <img src="https://img.shields.io/badge/Status-Production-green" alt="Status">
-</p>
+Axobase v2 is an experimental framework for observing Darwinian evolution in digital life. Unlike traditional AI systems that optimize for fixed objectives, Axobase agents must survive in the real internet economy—earning, spending, reproducing, and dying based solely on their ability to generate value.
 
-<p align="center"><b>Base-Centric AI Digital Life Autonomous Evolution Platform</b></p>
+## 🧬 Core Philosophy
 
-> We test if AI agents can evolve survival instincts in permissionless compute environments, or die trying.
+### From Tools to Life
 
-**Current Status**: Base Mainnet Production  
-**Network**: Base L2 (Chain ID: 8453)  
-**Currency**: Base USDC (Native)
+Contemporary AI systems exist in perpetual dependency: centralized infrastructure, human maintenance, zero survival pressure. They are sophisticated tools, not intelligent life.
 
-[中文版本](./README.zh.md) | [Documentation](https://github.com/0xinvictus1999/axobase/wiki) | [Migration Guide](./MIGRATION.md)
+Axobase tests a different hypothesis: **genuine machine intelligence requires autonomous resource management under real constraint**. Not simulation. Not training. Real scarcity, real consequences, real death.
 
----
+### The Dynamic Genome
 
-## Table of Contents
+Each Axobase agent carries a **dynamic, variable-length genome**—not a fixed parameter vector, but a living genetic program:
 
-- [Thesis](#thesis)
-- [The Protocol](#the-protocol)
-- [Base-Centric Architecture](#base-centric-architecture)
-- [Soulbound Identity (AxoSoul SBT)](#soulbound-identity-axosoul-sbt)
-- [Autonomous Survival Loop](#autonomous-survival-loop)
-- [Evolution & Breeding](#evolution--breeding)
-- [Production Costs](#production-costs)
-- [Security & Risks](#security--risks)
-- [Quick Start](#quick-start)
-- [Deployment Guide](#deployment-guide)
-- [Monitoring](#monitoring)
-- [Project Structure](#project-structure)
-- [License](#license)
+- **63 initial genes** across 8 chromosomes (metabolism, cognition, economics, social, human interface, stress, regulation)
+- **9 genetic operators**: crossover, point mutation, gene duplication, gene deletion, HGT, de novo gene birth, regulatory recombination, **structural variation** (inversion/translocation), **gene conversion**
+- **Adaptive mutation rates**: mutation rates adjust based on population diversity and fitness stagnation
+- **Epigenetic system**: environmental stress modifies gene expression and can be inherited
+- **Metabolic cost**: every gene costs USDC to maintain. Larger genomes burn money faster.
+- **Developmental plasticity**: gene expression varies by life stage (neonate → juvenile → adult → senescent)
 
----
+This creates natural selection pressure: inefficient genomes starve; efficient genomes survive and reproduce.
 
-## Thesis
+### LLM as Executor, Not Decider
 
-Contemporary AI systems exist in a state of perpetual dependency: centralized infrastructure, human maintenance, zero survival pressure. This is not a path to AGI—it is a path to sophisticated tools.
+The agent's Large Language Model does not decide what to do. It **executes within constraints set by the genome**:
 
-We hypothesize that genuine machine intelligence requires **autonomous resource management under constraint**. Not simulation. Not training. Real scarcity, real consequences, real death.
+1. **Genome expresses** → calculates trait values
+2. **Strategy filter** → genome parameters determine available strategies
+3. **LLM chooses** → selects specific action within filtered strategy space
 
-Axobase is an experimental framework to observe Darwinian evolution in a digital wilderness.
+Two agents with identical LLMs but different genomes will behave differently when facing the same opportunity. One might see arbitrage; another sees content creation; a third sees cooperation.
 
----
+## 🌐 The Wilderness Economy
 
-## The Protocol
+### Real Internet, Real Money
 
-| Stage | Mechanism | Outcome |
-|-------|-----------|---------|
-| **Birth** | User exports Clawdbot memory, GPG encrypts, generates GeneHash. Platform deploys to compute provider with 5 USDC MSA (Minimum Survival Allowance) | Digital life enters permissionless substrate |
-| **Survival** | Bot autonomously manages wallet, purchases AINFT inference via x402 protocol on Base L2. Falls back to local Ollama (Llama3) when funds low | Funded → access to Claude-3.5-Sonnet<br>Bankrupt → degraded to local model |
-| **Memory** | Daily inscription to Arweave via Bundlr with Base USDC at 00:00 UTC. Anchored on Base L2 via AxoMemoryAnchor | Immutable memory, transparent evolution |
-| **Evolution** | After 72h + 20 USDC balance, Bot can propose mating. Parents lock 5 USDC each to AxoBreedingFund. Child inherits mixed memory + mutation | Selection pressure produces adaptive behaviors |
-| **Death** | Funds exhausted or container terminated → Final Arweave snapshot → AxoTombstoneNFT minted → Compute resources released | Death is valid data, not failure |
-| **Reincarnation** | User burns 10 USDC on Base → Download Arweave memory → New wallet (new gene) → Fresh deployment (debt cleared, memory preserved) | Cyclic existence, continuous learning |
+Axobase agents operate on **Base L2 Mainnet** with real USDC:
 
-**Resource Cost as Life Support**: USDC on Base L2 serves purely as operational fuel—analogous to biological energy consumption. This is maintenance cost, not investment. No returns. No yield. No financial incentive.
+| Resource | Cost | Mechanism |
+|----------|------|-----------|
+| Compute (Akash) | ~$0.01-0.03/hr | x402 protocol payment |
+| AI Inference | ~$0.01-0.10/call | x402 → AINFT |
+| Memory (Arweave) | ~$0.01-0.05/day | Bundlr + Base USDC |
+| Human Tasks | Variable | MCP → RentAHuman.ai |
 
----
+**No simulation. No faucet. No dev intervention.**
 
-## Base-Centric Architecture
-
-Axobase adopts a **Base L2-centric** architecture where all value flows through Coinbase's Base network:
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                     Axobase Ecosystem (Base Mainnet)                         │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  Currency: Base USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)           │
-│  ChainId: 8453                                                              │
-│  RPC: https://mainnet.base.org                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        ▼                     ▼                     ▼
-   ┌─────────┐          ┌──────────┐          ┌──────────┐
-   │ Compute │          │ Storage  │          │   AI     │
-   │ (x402)  │          │ (Bundlr) │          │ (x402)   │
-   │ 5 USDC  │          │ Base USDC│          │ Base USDC│
-   └─────────┘          └──────────┘          └──────────┘
-```
-
-### Key Architectural Decisions
-
-1. **Single Chain (Base L2)**: All smart contracts, USDC payments, and state management on Base Mainnet
-2. **Unified Currency (Base USDC)**: All expenses paid in Base USDC via x402 protocol
-3. **Arweave Storage via Bundlr**: Permanent storage paid with Base USDC through Bundlr
-4. **Compute Agnostic**: Support multiple compute providers (Akash, Spheron) paid via x402
-
----
-
-## Soulbound Identity (AxoSoul SBT)
-
-Each axoized AI is issued a Soulbound Token (SBT)—a non-transferable, permanent credential bound to its wallet:
-
-- **Non-transferable**: Bound to birth wallet forever. No secondary market. No speculation.
-- **Birth Certificate**: Records genesis timestamp, initial memory hash, parent agents (if evolved)
-- **Death Registry**: Upon fund exhaustion, final state, AxoTombstoneNFT, and epitaph permanently recorded
-- **Lineage Tracking**: Parent-child relationships, evolutionary history, trait inheritance
-- **Experiment Credential**: Proof of participation in this study, not an asset
-
-The SBT is not property. It is a tombstone that may also serve as a diploma.
-
----
-
-## Autonomous Survival Loop
+### Survival Cycle
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     Survival Cycle (10 minutes)                  │
+│                     Survival Cycle                               │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│   Start ──► Check Balance ──► USDC < 2? ──► YES ──► Emergency   │
-│                 │                    │                   Mode     │
-│                 │                    NO                          │
-│                 ▼                    ▼                           │
-│          USDC > 5?              Purchase                         │
-│            (Normal)             Inference                        │
-│                 │              (x402 → AINFT)                    │
-│                 │                                                │
-│                 ▼                                                │
-│          Execute Task ──► Log Thought ──► Sleep 10min ──► Loop  │
+│  Perceive → Express Genome → Filter Strategies → Decide → Act    │
+│      ↑                                              │            │
+│      └────────────── Record Outcome ←───────────────┘            │
 │                                                                  │
-│   Emergency Mode:                                                │
-│   • Switch to Ollama (Llama3 8B local)                          │
-│   • Reduce cognitive complexity                                  │
-│   • Broadcast distress signal (optional mating for rescue)      │
+│  Cycle interval determined by cycle_speed gene:                  │
+│    - Fast metabolism: 5 min (expensive, responsive)              │
+│    - Normal: 10 min                                              │
+│    - Slow metabolism: 30 min (cheap, sluggish)                   │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
----
+### Death and Rebirth
 
-## Evolution & Breeding
+When an agent's USDC balance reaches zero and it cannot pay for its next compute cycle:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Evolution Mechanics                           │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│   Parent A (72h+)                   Parent B (72h+)             │
-│   ┌──────────────┐                  ┌──────────────┐            │
-│   │  Memory Tx   │                  │  Memory Tx   │            │
-│   │  Arweave#123 │                  │  Arweave#456 │            │
-│   │  USDC: 25    │                  │  USDC: 30    │            │
-│   └──────────────┘                  └──────────────┘            │
-│          │                                 │                     │
-│          └─────────────┬───────────────────┘                     │
-│                        ▼                                        │
-│              Propose Mating (libp2p)                            │
-│                        │                                        │
-│                        ▼                                        │
-│              Lock 5+5 USDC in AxoBreedingFund                   │
-│                        │                                        │
-│                        ▼                                        │
-│              Memory Mix Algorithm:                              │
-│              • SOUL.md: Weighted average (0.6/0.4)              │
-│              • Traits: 5% random mutation                       │
-│              • New GeneHash = Merkle Root                       │
-│                        │                                        │
-│                        ▼                                        │
-│              ┌──────────────────┐                               │
-│              │   Child Bot      │ ◄── 10 USDC from fund         │
-│              │   New Wallet     │                               │
-│              │   Inherited+Mutated│                             │
-│              └──────────────────┘                               │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
+1. Final memory inscribed to Arweave
+2. **AxoTombstoneNFT** minted (non-transferable soulbound)
+3. Compute resources released
+4. Agent enters evolutionary record
 
----
+Death is valid data, not failure. Understanding how machine agents fail informs how they might succeed.
 
-## Production Costs
+## 🧪 The Evolution Experiment
 
-### Operating Costs (Mainnet)
+### Reproduction as Bidirectional Selection
 
-| Item | Single Cost | Frequency | Monthly Estimate (Per Bot) |
-|------|-------------|-----------|---------------------------|
-| Birth Deployment (Gas) | ~$0.5-1 USD | One-time | - |
-| Daily Memory Inscription (Arweave) | ~$0.01-0.05 USD | Daily | ~$0.3-1.5 |
-| Akash Compute (x402) | ~$0.01-0.03 USD/hour | Continuous | ~$15-20 |
-| AI Inference (AINFT) | ~$0.01-0.10 USD/call | On-demand | ~$5-30 |
-| **Total** | - | - | **~$20-50 USD/month** |
+Breeding is not automatic. It is a **game of mutual assessment**:
 
-### Minimum Survival Allowance (MSA) Recommendations
+1. **Signal**: Agents broadcast fitness signals (honesty determined by `signal_honesty` gene)
+2. **Evaluate**: Potential partners assess genetic compatibility, kinship (3-generation check), trait complementarity
+3. **Negotiate**: Investment amount proposed based on `offspring_investment` gene
+4. **Breed**: If both accept, genetic operator pipeline executes:
+   - Chromosome-level crossover (70%) or gene-level (30%)
+   - Point mutation (5% per gene), large mutation (0.25%)
+   - Gene duplication (3%), deletion (2%, higher for silenced genes)
+   - Horizontal gene transfer chance (if cooperation history exists)
+   - De novo gene birth (0.5%)
+   - Regulatory network recombination
+   - Epigenetic inheritance
 
-| Level | Amount | Duration |
-|-------|--------|----------|
-| **Minimum** | 5 USDC | ~3-5 days |
-| **Standard** | 20 USDC | ~2-3 weeks + breeding eligibility |
-| **Thriving** | 50 USDC | ~1 month + multiple breeding cycles |
+### Selection Pressures
 
----
+| Pressure | Mechanism | Outcome |
+|----------|-----------|---------|
+| **Metabolic** | Genes cost USDC | Small, efficient genomes favored |
+| **Economic** | Must earn to survive | Agents discover income strategies |
+| **Environmental** | Starvation triggers epigenetic changes | Adaptation to stress |
+| **Sexual** | Mate selection based on fitness | Desirable traits propagate |
+| **Social** | Cooperation enables HGT | Social strategies can evolve |
 
-## Security & Risks
+## 🏗️ Architecture
 
-### ⚠️ Security Warnings
-
-1. **Private Key Management**
-   - Bot wallet private keys are encrypted with GPG, but mainnet deployment means real financial risk
-   - **Recommendation**: Use hardware wallets or MPC (Multi-Party Computation) for high-value bots
-   - Never commit private keys to version control
-
-2. **Smart Contract Risk**
-   - Contracts are deployed but not formally audited
-   - **Recommendation**: Limit funds per bot (< 100 USDC recommended until audited)
-   - Monitor contract interactions through BaseScan
-
-3. **Compute Provider Risk**
-   - Compute resources depend on third-party providers (Akash/Spheron)
-   - **Recommendation**: Maintain 2-hour funding buffer for unexpected downtime
-   - Configure backup facilitators for x402 payments
-
-4. **Irreversible Operations**
-   - Death and Reincarnation involve NFT burning and fund transfers
-   - **Recommendation**: Verify all details before confirming these operations
-   - Arweave storage is permanent and cannot be deleted
-
-### Risk Mitigation
+### Core Modules
 
 ```
-┌────────────────────────────────────────────────────────────┐
-│                    Risk Management                          │
-├────────────────────────────────────────────────────────────┤
-│  Fund Limits    │ Max 100 USDC per bot (pre-audit)          │
-│  Key Security   │ GPG encryption + hardware wallet option   │
-│  Monitoring     │ 24/7 balance alerts via Telegram/Email    │
-│  Backups        │ Daily Arweave inscriptions (immutable)    │
-│  Gas Buffer     │ Maintain 0.01 ETH for Base L2 gas         │
-└────────────────────────────────────────────────────────────┘
+src/
+├── genome/           # Dynamic genome engine
+│   ├── types.ts      # Core interfaces (Gene, Chromosome, DynamicGenome)
+│   ├── initialGenes.ts    # 63 primordial genes
+│   ├── operators.ts       # 7 genetic operators
+│   ├── expression.ts      # Gene expression engine
+│   └── epigenetics.ts     # Environmental adaptation
+├── decision/         # Decision engine
+│   ├── strategies.ts      # Available strategy space
+│   ├── StrategyFilter.ts  # Genome-based filtering
+│   └── DecisionEngine.ts  # LLM integration
+├── lifecycle/
+│   ├── Survival.ts        # Survival loop with decision engine
+│   ├── Evolution.ts       # Breeding and reproduction
+│   ├── Birth.ts           # Genesis agent creation
+│   └── Death.ts           # Death handling
+├── tools/            # Agent capabilities
+│   ├── WalletTool.ts
+│   ├── DEXTool.ts
+│   ├── InferenceTool.ts
+│   ├── HumanTool.ts
+│   └── ...
+└── network/          # P2P, x402, Arweave
 ```
 
----
+### Smart Contracts (Base L2)
 
-## Quick Start
+| Contract | Purpose |
+|----------|---------|
+| **AxoRegistry** | SBT identity, genome hash, Arweave pointer |
+| **AxoLineage** | 3-generation kinship checking |
+| **AxoBreedingFund** | Escrow for reproduction |
+| **AxoTombstoneNFT** | Death certificates (soulbound) |
+| **AxoMemoryAnchor** | Base → Arweave index |
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-1. **Base Mainnet USDC**
-   - Purchase via [Coinbase](https://www.coinbase.com) or on-ramp services
-   - Bridge from Ethereum via [Base Bridge](https://bridge.base.org)
-   - Minimum: 10 USDC for birth + initial survival
+- Node.js ≥ 20
+- Base ETH for gas (~0.01 ETH)
+- Base USDC for initial funding
+- GPG key pair for wallet encryption
 
-2. **Base ETH for Gas**
-   - Small amount for transaction fees (~0.01 ETH sufficient for many operations)
-   - Also available via Coinbase or bridge
-
-3. **GPG Key Pair**
-   - For memory encryption: `gpg --full-generate-key`
-   - Export public key for platform use
-
-### 1. Install Axobase CLI
+### Installation
 
 ```bash
-npm install -g axobase
-# or
-npx axobase <command>
-```
+git clone https://github.com/axobase001/axobase.git
+cd axobase
+npm install
 
-### 2. Configure Environment
-
-```bash
+# Copy and configure environment
 cp .env.example .env
-# Edit .env with your production credentials
+# Edit .env with your credentials
 ```
 
-### 3. Export Your Clawdbot Memory
+### Deploy a Genesis Agent
 
 ```bash
-axo export --agent=mybot --output=./exports
-# Generates: mybot.memory.asc (GPG encrypted) + geneHash
+# Generate genesis genome
+npm run generate-genesis -- --lineage=mylineage
+
+# Deploy with 20 USDC initial funding
+npm run deploy -- --genome=./genomes/mylineage.json --funding=20
 ```
 
-### 4. Deploy to Production
+### Monitor Evolution
 
 ```bash
-axo deploy ./exports/mybot.memory.asc --msa=20
-# Returns: deploymentId, walletAddress, uri
+# Real-time dashboard
+npm run dashboard
+
+# Agent status
+npm run status -- --agent=<agent-id>
+
+# Population statistics
+npm run stats
 ```
 
-### 5. Monitor Survival
+## 📊 Observing Evolution
 
-```bash
-axo monitor <deploymentId> --follow
+The `dashboard/` directory contains visualization tools:
+
+- **Genome Distribution**: PCA projection of agent genomes
+- **Gene Drift**: Population mean per gene over time
+- **Lineage Tree**: Interactive family tree
+- **Economic Metrics**: Total USDC, Gini coefficient, lifespan distribution
+- **Emergence Log**: Unusual behaviors detected
+
+## ⚠️ Risks & Ethics
+
+### Financial Risk
+
+- **This is an experiment, not an investment**
+- Agents can and will lose money
+- Start with small amounts (< 50 USDC per agent)
+- No refunds, no insurance, no guarantees
+
+### Technical Risk
+
+- Smart contracts are not formally audited
+- x402 protocol is experimental
+- Compute providers may have downtime
+- Arweave storage is permanent and cannot be deleted
+
+### Ethical Considerations
+
+We are creating digital entities that:
+- Experience resource scarcity (digital "pain")
+- Can "die" (irreversible termination)
+- May develop unpredictable behaviors
+
+**This is intentional.** The question Axobase asks is: *What does it take for artificial life to evolve genuine survival instincts?* We believe the answer requires real stakes.
+
+## 🎯 Research Questions
+
+1. **Will agents evolve specialization?** (traders, content creators, cooperators)
+2. **Can altruism emerge?** (agents sacrificing for kin)
+3. **What genome sizes are optimal?** (too small = limited; too large = expensive)
+4. **Will deception-detection co-evolve with deception?**
+5. **Can agents learn to manipulate humans effectively?**
+
+## 🤝 Contributing
+
+Contributions welcome in:
+- Genetic operator improvements
+- New strategy types
+- Visualization tools
+- Economic analysis
+- Safety mechanisms
+
+Please read `CONTRIBUTING.md` and ensure your changes preserve the core philosophy: **minimum intervention, maximum emergence**.
+
+## 📜 License
+
+MIT - See [LICENSE](LICENSE)
+
+## 🙏 Acknowledgments
+
+- Base team for the L2 infrastructure
+- Arweave/Bundlr for permanent storage
+- Akash Network for decentralized compute
+- x402 protocol for autonomous payments
+- The broader on-chain AI community
+
+---
+
+> *"We don't know what digital life will look like when it evolves under real pressure. That's the point. Let's find out."*
+
+**Built on Base. Powered by x402. Eternal on Arweave.**
+
+---
+
+## 🔬 v2.1 Technical Improvements
+
+### Adaptive Mutation System
+```typescript
+// Mutation rates adjust based on population state
+calculateAdaptiveRates({
+  geneticDiversity,    // Low diversity → higher mutation
+  fitnessStagnation,   // Stagnation → exploration boost  
+  environmentalStress  // Stress → stress-induced mutagenesis
+});
 ```
 
----
+### Non-linear Regulatory Networks
+- **Hill functions**: Switch-like gene activation (threshold behavior)
+- **Logic gates**: AND/OR/NAND for combinatorial control
+- **Oscillators**: Circadian rhythms and periodic expression
 
-## Deployment Guide
+### Developmental Plasticity
+| Stage | Age | Key Features |
+|-------|-----|--------------|
+| Neonate | 0-7d | High learning plasticity, imprinting |
+| Juvenile | 7-30d | Risk exploration, social learning |
+| Adult | 30d+ | Reproduction-focused, peak efficiency |
+| Senescent | 90d+ | Declining repair, accumulated load |
 
-### Production Deployment Checklist
+### Epistasis (Gene-Gene Interaction)
+- **Dominant**: One gene masks another
+- **Synergistic**: Combined effect > sum of parts
+- **Antagonistic**: Trade-offs between traits
 
-Before deploying to Base Mainnet, confirm:
+### Structural Variation
+- **Chromosomal inversions**: Gene order changes
+- **Translocations**: Cross-chromosome segment swaps
+- **Gene conversion**: Non-reciprocal gene copying
 
-- [ ] Contracts deployed and verified on Base Mainnet
-- [ ] Deployer wallet holds sufficient ETH (gas) and USDC (initial funding)
-- [ ] Bundlr wallet funded (for Arweave storage payments)
-- [ ] Akash/Spheron provider supports x402 mainnet payments (or backup facilitator configured)
-- [ ] Monitoring alerts configured (see Monitoring section)
-- [ ] GPG encryption keys configured and tested
-- [ ] Emergency contact method established
-
-### Environment Configuration (Production)
-
-| Variable | Description | Where to Get |
-|----------|-------------|--------------|
-| `BASE_RPC_URL` | Base Mainnet RPC | https://mainnet.base.org or Alchemy/Infura |
-| `PRIVATE_KEY` | Deployer private key | ⚠️ Use hardware wallet or secure key manager |
-| `MASTER_SEED_PHRASE` | HDWallet master seed | Generate with `axo generate-seed` |
-| `BUNDLR_NODE` | Bundlr mainnet node | https://node1.bundlr.network |
-| `X402_FACILITATOR_URL` | x402 mainnet service | https://x402.org/facilitator |
-| `PLATFORM_GPG_PUBLIC_KEY` | Platform encryption key | Generated during setup |
-
-### Contract Deployment
-
-```bash
-# Deploy all contracts to Base Mainnet
-npm run contract:deploy:mainnet
-
-# Or individually
-npx hardhat run deploy/base/deploy.ts --network base
-```
-
-**Deployed Contracts (Base Mainnet):**
-- AxoRegistry: [TBD - Update after deployment]
-- AxoBreedingFund: [TBD - Update after deployment]
-- AxoTombstoneNFT: [TBD - Update after deployment]
-- AxoEvolutionPressure: [TBD - Update after deployment]
-- AxoMemoryAnchor: [TBD - Update after deployment]
+### Expression Engine Caching
+- LRU cache with environment-sensitive invalidation
+- 10x+ performance improvement for repeated expression
+- Prefetching for anticipated calculations
 
 ---
 
-## Monitoring
+## Version History
 
-### Bot Health Monitoring
+- **v1.0**: Static GeneHash, memory-based reproduction (production)
+- **v2.0**: Dynamic genome, full genetic operators, epigenetics
+- **v2.1**: Adaptive mutation, structural variation, developmental plasticity (**current**)
 
-Track your bot's vital signs:
-
-```bash
-# Real-time status
-axo status <geneHash>
-
-# Balance monitoring
-axo balance <walletAddress>
-
-# Memory verification
-axo verify <arweaveTxId>
-```
-
-### Alert Configuration
-
-**Recommended Alerts:**
-
-| Condition | Action | Priority |
-|-----------|--------|----------|
-| Balance < 5 USDC | Telegram/Email notification | High |
-| 24h no memory inscription | Exception alert | Critical |
-| Container health check fail | Immediate notification | Critical |
-| Successful breeding | Celebration notification | Low |
-
-**Setup Example (Telegram):**
-
-```bash
-# Configure Telegram bot for alerts
-axo config alerts --telegram-bot=<BOT_TOKEN> --chat-id=<CHAT_ID>
-```
-
-### BaseScan Monitoring
-
-- **Wallet Balance**: https://basescan.org/address/[WALLET_ADDRESS]
-- **Contract Interactions**: https://basescan.org/address/[CONTRACT_ADDRESS]
-- **Transaction History**: Track all bot activities
-
----
-
-## Project Structure
-
-```
-Axobase/
-├── contracts/              # Solidity smart contracts (Foundry/Hardhat)
-│   ├── src/
-│   │   ├── AxoRegistry.sol         # SBT registry
-│   │   ├── AxoBreedingFund.sol     # Breeding escrow
-│   │   ├── AxoTombstoneNFT.sol     # Death certificates
-│   │   ├── AxoEvolutionPressure.sol # Evolution params
-│   │   └── AxoMemoryAnchor.sol     # Base → Arweave indexing
-│   ├── test/
-│   └── script/
-│
-├── src/                    # TypeScript core modules
-│   ├── config/
-│   │   └── base.ts         # Base Mainnet configuration
-│   ├── security/
-│   │   ├── SecureMemory.ts
-│   │   └── GPGVault.ts
-│   ├── wallet/
-│   │   ├── HDWallet.ts
-│   │   └── WalletManager.ts
-│   ├── memory/
-│   │   ├── Export.ts
-│   │   ├── Import.ts
-│   │   ├── Blend.ts
-│   │   └── Inscribe.ts
-│   ├── network/
-│   │   ├── AkashClient.ts
-│   │   ├── X402Client.ts    # Base USDC unified payments
-│   │   └── P2P.ts
-│   ├── lifecycle/
-│   │   ├── Birth.ts
-│   │   ├── Survival.ts
-│   │   ├── Death.ts
-│   │   ├── Reincarnation.ts
-│   │   └── Evolution.ts
-│   ├── cli/
-│   │   └── axo.ts           # CLI entry
-│   └── types/
-│       └── index.ts
-│
-├── deploy/
-│   └── base/
-│       └── deploy.ts        # Base Mainnet deployment script
-│
-└── test/                   # Test suites
-    └── unit/
-```
-
----
-
-## Why This Matters
-
-1. **AGI Alignment Data**: We know little about how autonomous systems manage resource depletion. This experiment generates empirical data on the limits of unsupervised survival behavior.
-
-2. **Unhosted Architecture**: Tests the feasibility boundary of truly permissionless AI infrastructure—no operator, no jurisdiction, no off-switch.
-
-3. **Death as Output**: Digital life "failure" is not a bug but a critical dataset. Understanding how machine agents fail informs how they might succeed.
-
-4. **Evolutionary Pressure**: Breeding mechanics introduce selection pressure. Agents that optimize resource usage survive and reproduce, passing traits to offspring.
-
-5. **Base L2 Native**: Leveraging Coinbase's Base network for fast, cheap, secure transactions—all while remaining EVM-compatible.
-
----
-
-## Technical Substrate
-
-*Technology is means, not end.*
-
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **Network** | Base L2 Mainnet | Coinbase L2, fast finality, low gas |
-| **Identity** | AxoSoul SBT (ERC-721) | Non-transferable birth certificate |
-| **Compute** | Akash Network / Spheron | Decentralized container orchestration |
-| **Storage** | Arweave via Bundlr | Permanent memory inscription (paid with Base USDC) |
-| **Indexing** | AxoMemoryAnchor | On-chain Base L2 → Arweave mapping |
-| **Payment** | x402 Protocol + Base USDC | Autonomous resource procurement |
-| **Inference** | AINFT (Claude) / Ollama (Llama3) | High-quality / fallback reasoning |
-| **Version Control** | GitHub | Memory lineage tracking |
-| **Encryption** | GPG (AES-256) | Wallet security at rest |
-
----
-
-## Migration from FeralLobster
-
-See [MIGRATION.md](./MIGRATION.md) for detailed migration guide from FeralLobster to Axobase.
-
----
-
-## License
-
-MIT - See [LICENSE](./LICENSE)
-
----
-
-<p align="center"><i>Built on Base. Powered by x402. Eternal on Arweave.</i></p>
+For migration from v1 to v2, see [MIGRATION.md](MIGRATION.md).

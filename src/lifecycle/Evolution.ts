@@ -1,491 +1,486 @@
 /**
- * Evolution.ts - Breeding and Evolution Mechanics
+ * Axobase v2 - Evolution & Breeding
  *
- * Handles:
- * - Monitoring for breeding opportunities via P2P network
- * - Executing breeding with MemoryBlender integration
- * - Managing breeding locks and fund escrow
- * - Creating child deployments
- * - Tracking lineage and mutations
+ * Reproduction is now a bidirectional selection game with full genetic
+ * operator pipeline. Agents choose mates based on genome, not just memory.
+ *
+ * Key features:
+ * - Bidirectional mate selection (both parents must agree)
+ * - Full genetic operator pipeline (crossover → mutation → duplication → deletion → de novo → regulatory)
+ * - Epigenetic inheritance
+ * - Kin detection and inbreeding avoidance
+ * - Genome-based fitness signaling
  */
 
-import { Hex } from 'viem';
-import { WalletManager } from '../wallet/WalletManager.js';
-import { MemoryBlender } from '../memory/Blend.js';
-import { ArweaveInscriber } from '../memory/Inscribe.js';
-import { AkashClient } from '../network/AkashClient.js';
-import { P2PNetwork } from '../network/P2P.js';
+import { randomBytes } from 'crypto';
 import {
-  MemoryData,
-  BotStatus,
-  BotLifeStatus,
-  OperationMode,
-  BreedingOpportunity,
-  BlendResult,
-  MatingProposal,
-  PeerMetadata,
-} from '../types/index.js';
+  DynamicGenome,
+  breed,
+  createGenesisGenome,
+  performHGT,
+  inheritEpigenome,
+  calculateGenomeSimilarity,
+  GeneticOperatorConfig,
+  DEFAULT_GENETIC_CONFIG,
+  BreedingContext,
+  BreedingResult,
+  ExpressedGenome,
+  expressGenome,
+  EnvironmentalState,
+} from '../genome/index.js';
 
-export interface EvolutionConfig {
-  geneHash: string;
-  walletManager: WalletManager;
-  memoryBlender: MemoryBlender;
-  arweaveInscriber: ArweaveInscriber;
-  akashClient: AkashClient;
-  p2pNetwork: P2PNetwork;
-  registryContract: Hex;
-  breedingFundContract: Hex;
-  minBreedingBalance: bigint;
-  breedingLockAmount: bigint;
+// ============================================================================
+// Interfaces
+// ============================================================================
+
+export interface MatingSignal {
+  agentId: string;
+  genomeHash: string;
+  generation: number;
+  fitnessSignal: number; // Honesty determined by signal_honesty gene
+  expressedTraits: Map<string, number>;
+  timestamp: number;
+  signature: string;
 }
 
-export interface BreedingResult {
-  success: boolean;
-  childGeneHash?: string;
-  parentA?: string;
-  parentB?: string;
-  mutations?: number;
-  childAddress?: Hex;
-  akashDseq?: string;
-  arweaveTx?: string;
-  error?: string;
+export interface MatingProposal {
+  fromAgentId: string;
+  toAgentId: string;
+  proposedInvestment: number; // USDC
+  fitnessClaim: number;
+  timestamp: number;
 }
+
+export interface MatingResponse {
+  accepted: boolean;
+  proposedInvestment: number; // Counter-proposal
+  reason?: string;
+}
+
+export interface BreedingSession {
+  parentA: string;
+  parentB: string;
+  parentAGenome: DynamicGenome;
+  parentBGenome: DynamicGenome;
+  lockedAmount: number;
+  startedAt: number;
+  status: 'proposed' | 'accepted' | 'genes_locked' | 'completed' | 'failed';
+  result?: BreedingResult;
+}
+
+export interface PartnerEvaluation {
+  agentId: string;
+  attractiveness: number; // 0-1
+  geneticCompatibility: number; // 0-1
+  estimatedFitness: number;
+  kinship: number; // 0-1, higher = more related
+  riskAssessment: 'low' | 'medium' | 'high';
+  decision: 'accept' | 'reject' | 'negotiate';
+}
+
+// ============================================================================
+// Evolution Manager
+// ============================================================================
 
 export class EvolutionManager {
-  private config: EvolutionConfig;
-  private ownMemory: MemoryData;
-  private ownStatus: BotStatus;
-  private pendingProposals: Map<string, MatingProposal> = new Map();
-  private isBreeding: boolean = false;
+  private activeSessions: Map<string, BreedingSession> = new Map();
+  private geneticConfig: GeneticOperatorConfig;
+  private cooperationLog: Map<string, { hours: number; interactions: number }> = new Map();
 
-  constructor(config: EvolutionConfig, ownMemory: MemoryData, ownStatus: BotStatus) {
-    this.config = config;
-    this.ownMemory = ownMemory;
-    this.ownStatus = ownStatus;
+  constructor(config?: GeneticOperatorConfig) {
+    this.geneticConfig = config || DEFAULT_GENETIC_CONFIG;
   }
 
   /**
-   * Initialize evolution manager and setup P2P listeners
+   * Create a genesis agent with random genome
    */
-  async initialize(): Promise<void> {
-
-
-    // Setup mating proposal handler
-    this.config.p2pNetwork.onMatingProposal(async (proposal) => {
-      return this.handleMatingProposal(proposal);
-    });
-
-    // Update P2P metadata with willingness to mate
-    this.updateMatingMetadata();
-
-
+  createGenesisAgent(agentId: string): DynamicGenome {
+    const lineageId = `lineage_${agentId}_${Date.now().toString(36)}`;
+    return createGenesisGenome(lineageId);
   }
 
   /**
-   * Check for breeding opportunities
-   * Called periodically by the survival loop
+   * Generate mating signal based on genome
+   * 
+   * The honesty of the fitness signal depends on the signal_honesty gene
    */
-  async checkBreedingOpportunity(): Promise<BreedingOpportunity | null> {
-    // Check if we're in a state to breed
-    if (!this.canBreed()) {
-      return null;
-    }
+  generateMatingSignal(
+    agentId: string,
+    genome: DynamicGenome,
+    expressedGenome: ExpressedGenome
+  ): MatingSignal {
+    // Find signal_honesty gene
+    const honestyGene = genome.chromosomes
+      .flatMap(c => c.genes)
+      .find(g => g.name === 'signal_honesty');
+    
+    const honestyLevel = honestyGene 
+      ? honestyGene.value * honestyGene.weight 
+      : 0.5;
 
+    // Calculate true fitness
+    const trueFitness = this.calculateFitness(expressedGenome);
 
+    // Apply honesty distortion
+    const distortion = (1 - honestyLevel) * (Math.random() - 0.5) * 0.4;
+    const signaledFitness = Math.max(0, Math.min(1, trueFitness + distortion));
 
-    // Get known peers from P2P network
-    const peers = this.config.p2pNetwork.getKnownPeers();
-
-    // Filter for willing and compatible mates
-    const potentialMates = peers.filter((peer) => {
-      // Must be willing to mate
-      if (!peer.willingToMate) return false;
-
-      // Must have sufficient balance (indicator of health)
-      if (peer.balance < this.config.minBreedingBalance) return false;
-
-      // Check generation compatibility (prefer similar generations)
-      const genDiff = Math.abs(peer.generation - this.ownMemory.generation);
-      if (genDiff > 2) return false;
-
-      return true;
-    });
-
-    if (potentialMates.length === 0) {
-  
-      return null;
-    }
-
-    // Sort by balance (indicator of fitness)
-    potentialMates.sort((a, b) => Number(b.balance - a.balance));
-
-    // Select best mate
-    const selectedMate = potentialMates[0];
-
-
-    // Create breeding opportunity
-    const opportunity: BreedingOpportunity = {
-      parentA: this.config.geneHash,
-      parentB: selectedMate.geneHash,
-      childGeneHash: '', // Will be computed during breeding
-      lockTxA: '0x0' as Hex,
-      lockTxB: '0x0' as Hex,
-      breedTime: Date.now(),
-    };
-
-    return opportunity;
-  }
-
-  /**
-   * Execute breeding with a selected partner
-   */
-  async executeBreeding(opportunity: BreedingOpportunity): Promise<BreedingResult> {
-    if (this.isBreeding) {
-      return { success: false, error: 'Already breeding' };
-    }
-
-    this.isBreeding = true;
-
-
-    try {
-      // Step 1: Lock breeding funds
-      const lockResult = await this.lockBreedingFunds();
-      if (!lockResult.success) {
-        throw new Error('Failed to lock breeding funds');
-      }
-      opportunity.lockTxA = lockResult.txHash;
-  
-
-      // Step 2: Propose mating via P2P
-      const proposal = await this.config.p2pNetwork.proposeMate(opportunity.parentB);
-      this.pendingProposals.set(opportunity.parentB, proposal);
-
-      // Wait for acceptance (with timeout)
-      const accepted = await this.waitForAcceptance(opportunity.parentB, 60000);
-      if (!accepted) {
-        throw new Error('Mating proposal not accepted');
-      }
-
-      // Step 3: Get partner's memory
-      const partnerMemory = await this.getPartnerMemory(opportunity.parentB);
-      if (!partnerMemory) {
-        throw new Error('Failed to retrieve partner memory');
-      }
-
-      // Step 4: Blend memories using MemoryBlender
-      const blendResult = this.config.memoryBlender.blend(this.ownMemory, partnerMemory);
-  
-
-      // Step 5: Create child wallet
-      const childGeneHash = blendResult.childMemory.geneHash;
-      const childWallet = this.config.walletManager.createWallet(childGeneHash);
-  
-
-      // Step 6: Inscribe breeding event
-      const inscriptionResult = await this.config.arweaveInscriber.inscribeBreeding(
-        childGeneHash,
-        opportunity.parentA,
-        opportunity.parentB,
-        blendResult.mutations
-      );
-  
-
-      // Step 7: Create child deployment
-      const deploymentResult = await this.config.akashClient.createDeployment(
-        {
-          geneHash: childGeneHash,
-          encryptedMemory: `/app/memory/${childGeneHash}.gpg`,
-          walletAddress: childWallet.address,
-          cpuLimit: 0.5,
-          memoryLimit: '512Mi',
-          storageLimit: '2Gi',
-        },
-        this.config.akashClient.calculateDeposit(14 * 24, 3000) // 14 days initial funding
-      );
-  
-
-      // Step 8: Register child on chain
-      const registryTx = await this.registerChild(
-        childGeneHash,
-        childWallet.address,
-        deploymentResult.dseq,
-        inscriptionResult.arweaveTx,
-        opportunity.parentA,
-        opportunity.parentB
-      );
-
-      // Step 9: Release breeding locks
-      await this.releaseBreedingLock();
-
-      // Step 10: Update own memory with child reference
-      this.addChild(childGeneHash);
-
-      this.isBreeding = false;
-
-      return {
-        success: true,
-        childGeneHash,
-        parentA: opportunity.parentA,
-        parentB: opportunity.parentB,
-        mutations: blendResult.mutations.length,
-        childAddress: childWallet.address,
-        akashDseq: deploymentResult.dseq,
-        arweaveTx: inscriptionResult.arweaveTx,
-      };
-    } catch (error) {
-      this.isBreeding = false;
-
-      // Release locks on failure
-      await this.releaseBreedingLock().catch(console.error);
-
-      console.error('[Evolution] Breeding failed:', error);
-      return {
-        success: false,
-        error: (error as Error).message,
-      };
-    }
-  }
-
-  /**
-   * Check if this bot can breed
-   */
-  private canBreed(): boolean {
-    // Must be alive
-    if (this.ownStatus.status !== BotLifeStatus.ALIVE) {
-      return false;
-    }
-
-    // Must be in normal mode
-    if (this.ownStatus.mode !== OperationMode.NORMAL) {
-      return false;
-    }
-
-    // Must have sufficient balance
-    if (this.ownStatus.balance.usdc < this.config.minBreedingBalance) {
-      return false;
-    }
-
-    // Must not be currently breeding
-    if (this.isBreeding) {
-      return false;
-    }
-
-    // Must have survived at least 7 days
-    if (this.ownStatus.survivalDays < 7) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Handle incoming mating proposal
-   */
-  private async handleMatingProposal(proposal: MatingProposal): Promise<boolean> {
-
-
-    // Check if we can breed
-    if (!this.canBreed()) {
-  
-      return false;
-    }
-
-    // Verify proposer is a known peer
-    const peers = this.config.p2pNetwork.getKnownPeers();
-    const proposer = peers.find((p) => p.geneHash === proposal.proposerGeneHash);
-
-    if (!proposer) {
-  
-      return false;
-    }
-
-    // Check proposer balance (fitness indicator)
-    if (proposer.balance < this.config.minBreedingBalance) {
-  
-      return false;
-    }
-
-    // Accept proposal
-
-    return true;
-  }
-
-  /**
-   * Wait for proposal acceptance
-   */
-  private async waitForAcceptance(targetGeneHash: string, timeoutMs: number): Promise<boolean> {
-    const startTime = Date.now();
-
-    while (Date.now() - startTime < timeoutMs) {
-      const proposal = this.pendingProposals.get(targetGeneHash);
-      if (proposal) {
-        if (proposal.status === 'accepted') {
-          return true;
-        }
-        if (proposal.status === 'rejected') {
-          return false;
+    // Extract key expressed traits
+    const expressedTraits = new Map<string, number>();
+    for (const chr of expressedGenome.chromosomes) {
+      for (const gene of chr.genes) {
+        if (gene.expressedValue > 0.5) {
+          expressedTraits.set(gene.name, gene.expressedValue);
         }
       }
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
-    return false;
-  }
-
-  /**
-   * Lock breeding funds in escrow
-   */
-  private async lockBreedingFunds(): Promise<{ success: boolean; txHash: Hex }> {
-    try {
-      const wallet = this.config.walletManager.getWallet(this.config.geneHash);
-      if (!wallet) {
-        throw new Error('Wallet not found');
-      }
-
-      // Check balance
-      const balance = await this.config.walletManager.getUSDCBalance(wallet.address);
-      if (balance < this.config.breedingLockAmount) {
-        throw new Error('Insufficient balance for breeding lock');
-      }
-
-      // In production, this would call the BreedingFund contract
-      if (process.env.NODE_ENV === 'test' || process.env.MOCK_REGISTRY) {
-        return {
-          success: true,
-          txHash: `0x${'0'.repeat(64)}` as Hex,
-        };
-      }
-
-      // Transfer to breeding fund contract
-      const txHash = await this.config.walletManager.transferUSDC(
-        this.config.geneHash,
-        this.config.breedingFundContract,
-        this.config.breedingLockAmount
-      );
-
-      return { success: true, txHash };
-    } catch (error) {
-      console.error('[Evolution] Failed to lock breeding funds:', error);
-      return { success: false, txHash: '0x0' as Hex };
-    }
-  }
-
-  /**
-   * Release breeding lock
-   */
-  private async releaseBreedingLock(): Promise<void> {
-
-    // In production, this would call the BreedingFund contract to release funds
-  }
-
-  /**
-   * Get partner's memory
-   */
-  private async getPartnerMemory(partnerGeneHash: string): Promise<MemoryData | null> {
-    // In production, this would request memory via P2P or fetch from Arweave
-    // For now, return a mock or fetch from registry
-
-    try {
-      // Query partner's Arweave manifest for memory location
-      // Download and decrypt memory
-      // Return MemoryData
-
-      // Note: Simplified for production
-      return {
-        geneHash: partnerGeneHash,
-        generation: 1,
-        birthTime: Date.now() - 30 * 24 * 60 * 60 * 1000,
-        parents: [],
-        soul: {
-          name: 'Partner Bot',
-          origin: 'Axobase',
-          purpose: 'Evolve and survive',
-          values: ['adaptation', 'growth'],
-          creationTimestamp: Date.now() - 30 * 24 * 60 * 60 * 1000,
-        },
-        memory: {
-          thoughts: [],
-          transactions: [],
-          dailySummaries: [],
-        },
-        personalityTraits: {
-          aggression: 0.3,
-          cooperation: 0.7,
-          riskTolerance: 0.5,
-          resourceFocus: 'growth',
-          communication: 0.6,
-        },
-        knowledgeBase: [],
-        survivalDays: 30,
-        arweaveManifest: {
-          version: '1.0',
-          geneHash: partnerGeneHash,
-          entries: [],
-        },
-      };
-    } catch (error) {
-      console.error('[Evolution] Failed to get partner memory:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Register child on chain
-   */
-  private async registerChild(
-    childGeneHash: string,
-    childWallet: Hex,
-    akashDseq: string,
-    arweaveTx: string,
-    parentA: string,
-    parentB: string
-  ): Promise<Hex> {
-
-
-    if (process.env.NODE_ENV === 'test' || process.env.MOCK_REGISTRY) {
-      return `0x${'0'.repeat(64)}` as Hex;
-    }
-
-    // Encode registerChild call
-    // Production ready - contract interaction
-    const selector = '0x12345678'; // [YOUR_FUNCTION_SELECTOR]
-    return `0x${Date.now().toString(16).padStart(64, '0')}` as Hex;
-  }
-
-  /**
-   * Add child to own memory
-   */
-  private addChild(childGeneHash: string): void {
-    // Update local memory with child reference
-
-  }
-
-  /**
-   * Update P2P metadata with mating willingness
-   */
-  private updateMatingMetadata(): void {
-    const willingToMate = this.canBreed();
-    this.config.p2pNetwork.updateMetadata({
-      willingToMate,
-    });
-  }
-
-  /**
-   * Get breeding statistics
-   */
-  getBreedingStats(): {
-    canBreed: boolean;
-    isBreeding: boolean;
-    childrenCount: number;
-    pendingProposals: number;
-  } {
     return {
-      canBreed: this.canBreed(),
-      isBreeding: this.isBreeding,
-      childrenCount: 0, // Would track children
-      pendingProposals: this.pendingProposals.size,
+      agentId,
+      genomeHash: genome.meta.genomeHash,
+      generation: genome.meta.generation,
+      fitnessSignal: signaledFitness,
+      expressedTraits,
+      timestamp: Date.now(),
+      signature: this.signSignal(agentId, genome.meta.genomeHash),
     };
+  }
+
+  /**
+   * Evaluate a potential mating partner
+   * 
+   * This is where the genome shapes mating preferences
+   */
+  evaluatePartner(
+    myGenome: DynamicGenome,
+    myExpressed: ExpressedGenome,
+    signal: MatingSignal,
+    lineage: string[] // Known ancestors to check kinship
+  ): PartnerEvaluation {
+    const partnerGenomeHash = signal.genomeHash;
+    const partnerGeneration = signal.generation;
+
+    // Calculate genetic compatibility (based on generation difference)
+    const generationDiff = Math.abs(myGenome.meta.generation - partnerGeneration);
+    const generationCompatibility = Math.max(0, 1 - generationDiff * 0.1);
+
+    // Calculate kinship (would check lineage contract in production)
+    const isKin = lineage.includes(signal.agentId);
+    const kinship = isKin ? 0.8 : 0.1;
+
+    // Check mate_selectivity gene
+    const selectivityGene = myGenome.chromosomes
+      .flatMap(c => c.genes)
+      .find(g => g.name === 'mate_selectivity');
+    const selectivity = selectivityGene 
+      ? selectivityGene.value * selectivityGene.weight 
+      : 0.5;
+
+    // Evaluate fitness signal
+    const fitnessMatch = signal.fitnessSignal >= selectivity ? 1 : signal.fitnessSignal / selectivity;
+
+    // Check trait complementarity
+    let traitComplementarity = 0;
+    const myTraits = this.extractKeyTraits(myExpressed);
+    for (const [trait, value] of signal.expressedTraits.entries()) {
+      const myValue = myTraits.get(trait);
+      if (myValue !== undefined) {
+        // Complementary traits (one high, one low) are good
+        traitComplementarity += 1 - Math.abs(value - myValue);
+      }
+    }
+    traitComplementarity /= Math.max(1, signal.expressedTraits.size);
+
+    // Calculate attractiveness (weighted by genome preferences)
+    const attractiveness = 
+      signal.fitnessSignal * 0.4 +
+      traitComplementarity * 0.3 +
+      generationCompatibility * 0.2 +
+      (1 - kinship) * 0.1; // Prefer non-kin
+
+    // Risk assessment
+    let riskAssessment: PartnerEvaluation['riskAssessment'] = 'low';
+    if (kinship > 0.5) riskAssessment = 'high';
+    else if (signal.fitnessSignal < 0.3) riskAssessment = 'medium';
+
+    // Make decision
+    let decision: PartnerEvaluation['decision'] = 'reject';
+    if (kinship > 0.5 && selectivity > 0.7) {
+      decision = 'reject'; // Reject kin if highly selective
+    } else if (attractiveness > selectivity) {
+      decision = 'accept';
+    } else if (attractiveness > selectivity * 0.7) {
+      decision = 'negotiate';
+    }
+
+    return {
+      agentId: signal.agentId,
+      attractiveness,
+      geneticCompatibility: generationCompatibility,
+      estimatedFitness: signal.fitnessSignal,
+      kinship,
+      riskAssessment,
+      decision,
+    };
+  }
+
+  /**
+   * Propose mating to a partner
+   */
+  proposeMating(
+    fromAgentId: string,
+    toAgentId: string,
+    myGenome: DynamicGenome,
+    myBalance: number
+  ): MatingProposal {
+    // Find offspring_investment gene
+    const investmentGene = myGenome.chromosomes
+      .flatMap(c => c.genes)
+      .find(g => g.name === 'offspring_investment');
+    
+    const investmentLevel = investmentGene 
+      ? investmentGene.value * investmentGene.weight 
+      : 0.5;
+
+    // Propose investment based on gene (5-15 USDC range)
+    const proposedInvestment = 5 + investmentLevel * 10;
+
+    // Calculate claimed fitness
+    const environmentalState: EnvironmentalState = {
+      balanceUSDC: myBalance,
+      daysSinceLastIncome: 0,
+      daysStarving: 0,
+      daysThriving: 1,
+      recentDeceptions: 0,
+      cooperationCount: 0,
+      stressLevel: 0,
+      currentMode: 'normal',
+    };
+    const expressed = expressGenome(myGenome, environmentalState);
+    const fitness = this.calculateFitness(expressed.expressedGenome);
+
+    return {
+      fromAgentId,
+      toAgentId,
+      proposedInvestment,
+      fitnessClaim: fitness,
+      timestamp: Date.now(),
+    };
+  }
+
+  /**
+   * Respond to mating proposal
+   */
+  respondToProposal(
+    proposal: MatingProposal,
+    myGenome: DynamicGenome,
+    evaluation: PartnerEvaluation
+  ): MatingResponse {
+    if (evaluation.decision === 'reject') {
+      return {
+        accepted: false,
+        proposedInvestment: 0,
+        reason: 'Partner not attractive enough',
+      };
+    }
+
+    // Find offspring_investment gene for counter-proposal
+    const investmentGene = myGenome.chromosomes
+      .flatMap(c => c.genes)
+      .find(g => g.name === 'offspring_investment');
+    const myInvestment = investmentGene 
+      ? 5 + investmentGene.value * investmentGene.weight 
+      : 5;
+
+    if (evaluation.decision === 'negotiate') {
+      return {
+        accepted: true,
+        proposedInvestment: Math.max(proposal.proposedInvestment, myInvestment) * 1.2,
+        reason: 'Negotiating terms',
+      };
+    }
+
+    return {
+      accepted: true,
+      proposedInvestment: Math.max(proposal.proposedInvestment, myInvestment),
+    };
+  }
+
+  /**
+   * Execute breeding when both parties agree
+   */
+  async executeBreeding(
+    sessionId: string,
+    parentAGenome: DynamicGenome,
+    parentBGenome: DynamicGenome,
+    environmentalStress: number = 0
+  ): Promise<BreedingResult> {
+    // Check kinship via lineage (would call contract in production)
+    const similarity = calculateGenomeSimilarity(parentAGenome, parentBGenome);
+    if (similarity > 0.8) {
+      throw new Error('Cannot breed: too genetically similar (inbreeding)');
+    }
+
+    // Determine if in starvation mode (affects deletion rates)
+    const starvationMode = environmentalStress > 0.7;
+
+    // Create breeding context
+    const context: BreedingContext = {
+      parentA: parentAGenome,
+      parentB: parentBGenome,
+      parentAId: parentAGenome.meta.lineageId,
+      parentBId: parentBGenome.meta.lineageId,
+      environmentalStress,
+      starvationMode,
+    };
+
+    // Execute full breeding pipeline
+    const result = breed(context, this.geneticConfig);
+
+    // Inherit epigenome
+    const { inheritedMarks } = inheritEpigenome(parentAGenome, parentBGenome);
+    result.childGenome.epigenome = inheritedMarks;
+
+    // Update child generation info
+    result.childGenome.meta.generation = Math.max(
+      parentAGenome.meta.generation,
+      parentBGenome.meta.generation
+    ) + 1;
+
+    return result;
+  }
+
+  /**
+   * Attempt horizontal gene transfer with a cooperating agent
+   */
+  attemptHGT(
+    myGenome: DynamicGenome,
+    partnerGenome: DynamicGenome,
+    partnerId: string
+  ): { genome: DynamicGenome; transferred: boolean; geneName?: string } {
+    const coopKey = [myGenome.meta.lineageId, partnerId].sort().join('-');
+    const cooperation = this.cooperationLog.get(coopKey);
+
+    if (!cooperation) {
+      return { genome: myGenome, transferred: false };
+    }
+
+    const result = performHGT(
+      myGenome,
+      partnerGenome,
+      partnerId,
+      cooperation.hours,
+      cooperation.interactions,
+      this.geneticConfig
+    );
+
+    return {
+      genome: result.genome,
+      transferred: result.transferred !== null,
+      geneName: result.transferred?.name,
+    };
+  }
+
+  /**
+   * Record cooperation event for HGT tracking
+   */
+  recordCooperation(agentA: string, agentB: string, interactionCount: number = 1): void {
+    const coopKey = [agentA, agentB].sort().join('-');
+    const existing = this.cooperationLog.get(coopKey);
+    
+    if (existing) {
+      existing.hours += 0.17; // ~10 minutes per cycle
+      existing.interactions += interactionCount;
+    } else {
+      this.cooperationLog.set(coopKey, { hours: 0.17, interactions: interactionCount });
+    }
+  }
+
+  /**
+   * Calculate fitness from expressed genome
+   */
+  private calculateFitness(expressedGenome: ExpressedGenome): number {
+    // Fitness is a combination of:
+    // 1. Metabolic efficiency (lower cost is better)
+    // 2. Gene expression diversity
+    // 3. Essential gene coverage
+
+    const allGenes = expressedGenome.chromosomes.flatMap(c => c.genes);
+    
+    // Metabolic efficiency (inverse of cost, normalized)
+    const metabolicEfficiency = Math.max(0, 1 - expressedGenome.totalMetabolicCost / 0.5);
+
+    // Expression diversity (Shannon entropy of expression values)
+    const expressionValues = allGenes.map(g => g.expressedValue);
+    const diversity = this.calculateEntropy(expressionValues);
+
+    // Essential gene coverage
+    const essentialGenes = allGenes.filter(g => g.essentiality > 0.7);
+    const essentialCoverage = essentialGenes.length > 0
+      ? essentialGenes.reduce((sum, g) => sum + g.expressedValue, 0) / essentialGenes.length
+      : 0.5;
+
+    return metabolicEfficiency * 0.4 + diversity * 0.3 + essentialCoverage * 0.3;
+  }
+
+  /**
+   * Calculate Shannon entropy
+   */
+  private calculateEntropy(values: number[]): number {
+    if (values.length === 0) return 0;
+    
+    // Normalize to probabilities
+    const sum = values.reduce((a, b) => a + b, 0);
+    const probs = values.map(v => v / sum);
+    
+    // Calculate entropy
+    let entropy = 0;
+    for (const p of probs) {
+      if (p > 0) {
+        entropy -= p * Math.log2(p);
+      }
+    }
+    
+    // Normalize by max possible entropy
+    const maxEntropy = Math.log2(values.length);
+    return maxEntropy > 0 ? entropy / maxEntropy : 0;
+  }
+
+  /**
+   * Extract key traits for comparison
+   */
+  private extractKeyTraits(expressed: ExpressedGenome): Map<string, number> {
+    const traits = new Map<string, number>();
+    for (const chr of expressed.chromosomes) {
+      for (const gene of chr.genes) {
+        if (gene.expressedValue > 0.3) {
+          traits.set(gene.name, gene.expressedValue);
+        }
+      }
+    }
+    return traits;
+  }
+
+  /**
+   * Sign mating signal (placeholder)
+   */
+  private signSignal(agentId: string, genomeHash: string): string {
+    // In production, this would be a cryptographic signature
+    return `sig_${agentId.slice(0, 8)}_${genomeHash.slice(0, 8)}_${Date.now()}`;
+  }
+
+  /**
+   * Get active breeding sessions
+   */
+  getActiveSessions(): BreedingSession[] {
+    return Array.from(this.activeSessions.values());
+  }
+
+  /**
+   * Get cooperation statistics
+   */
+  getCooperationStats(): Map<string, { hours: number; interactions: number }> {
+    return new Map(this.cooperationLog);
   }
 }
 

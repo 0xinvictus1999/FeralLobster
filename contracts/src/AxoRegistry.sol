@@ -20,19 +20,23 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
     }
     
     struct Bot {
-        bytes32 geneHash;
+        bytes32 geneHash;           // Hash of dynamic genome (for on-chain verification)
+        string genomeArweaveTx;     // Arweave tx containing full DynamicGenome
         address wallet;
-        string computeDseq;      // Akash/Spheron deployment sequence
-        string computeProvider;  // akash | spheron
+        string computeDseq;         // Akash/Spheron deployment sequence
+        string computeProvider;     // akash | spheron
         BotStatus status;
         uint256 birthTime;
         uint256 deathTime;
-        bytes32[] parents;
+        uint256 survivalDays;       // Days survived before death
+        bytes32 parentA;            // Parent A genome hash
+        bytes32 parentB;            // Parent B genome hash
         bytes32[] children;
         string arweaveBirthTx;
         string arweaveDeathTx;
         uint256 generation;
         uint256 tombstoneId;
+        uint256 totalGeneCount;     // Total genes at birth
     }
     
     // geneHash => Bot
@@ -52,12 +56,22 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
     // Events
     event BotBorn(
         bytes32 indexed geneHash,
+        string genomeArweaveTx,
         address indexed wallet,
         string computeDseq,
         string computeProvider,
         uint256 timestamp,
-        bytes32[] parents,
-        uint256 generation
+        bytes32 parentA,
+        bytes32 parentB,
+        uint256 generation,
+        uint256 totalGeneCount
+    );
+    
+    event GenomeUpdated(
+        bytes32 indexed geneHash,
+        string newArweaveTx,
+        uint256 newGeneCount,
+        uint256 timestamp
     );
     
     event BotDied(
@@ -97,33 +111,43 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
      */
     function registerBirth(
         bytes32 geneHash,
+        string calldata genomeArweaveTx,
         address wallet,
         string calldata computeDseq,
         string calldata computeProvider,
         string calldata arweaveBirthTx,
-        bytes32[] calldata parents,
-        uint256 generation
+        bytes32 parentA,
+        bytes32 parentB,
+        uint256 generation,
+        uint256 totalGeneCount
     ) external onlyAuthorized nonReentrant {
         require(bots[geneHash].birthTime == 0, "Bot already exists");
         require(wallet != address(0), "Invalid wallet");
         require(bytes(computeDseq).length > 0, "Invalid dseq");
+        require(bytes(genomeArweaveTx).length > 0, "Invalid genome Arweave tx");
         
         Bot storage bot = bots[geneHash];
         bot.geneHash = geneHash;
+        bot.genomeArweaveTx = genomeArweaveTx;
         bot.wallet = wallet;
         bot.computeDseq = computeDseq;
         bot.computeProvider = computeProvider;
         bot.status = BotStatus.Alive;
         bot.birthTime = block.timestamp;
-        bot.parents = parents;
+        bot.parentA = parentA;
+        bot.parentB = parentB;
         bot.generation = generation;
+        bot.totalGeneCount = totalGeneCount;
         bot.arweaveBirthTx = arweaveBirthTx;
         
         walletToGene[wallet] = geneHash;
         
         // Update parent children arrays
-        for (uint i = 0; i < parents.length; i++) {
-            bots[parents[i]].children.push(geneHash);
+        if (parentA != bytes32(0)) {
+            bots[parentA].children.push(geneHash);
+        }
+        if (parentB != bytes32(0)) {
+            bots[parentB].children.push(geneHash);
         }
         
         totalBorn++;
@@ -131,13 +155,33 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
         
         emit BotBorn(
             geneHash,
+            genomeArweaveTx,
             wallet,
             computeDseq,
             computeProvider,
             block.timestamp,
-            parents,
-            generation
+            parentA,
+            parentB,
+            generation,
+            totalGeneCount
         );
+    }
+    
+    /**
+     * @dev Update genome (e.g., after significant epigenetic changes)
+     */
+    function updateGenome(
+        bytes32 geneHash,
+        string calldata newGenomeArweaveTx,
+        uint256 newGeneCount
+    ) external onlyAuthorized {
+        require(bots[geneHash].birthTime > 0, "Bot does not exist");
+        
+        Bot storage bot = bots[geneHash];
+        bot.genomeArweaveTx = newGenomeArweaveTx;
+        bot.totalGeneCount = newGeneCount;
+        
+        emit GenomeUpdated(geneHash, newGenomeArweaveTx, newGeneCount, block.timestamp);
     }
     
     /**
@@ -147,7 +191,8 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
         bytes32 geneHash,
         uint256 tombstoneId,
         string calldata reason,
-        string calldata arweaveDeathTx
+        string calldata arweaveDeathTx,
+        string calldata finalGenomeArweaveTx
     ) external onlyAuthorized nonReentrant {
         Bot storage bot = bots[geneHash];
         require(bot.birthTime > 0, "Bot does not exist");
@@ -156,8 +201,14 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
         BotStatus oldStatus = bot.status;
         bot.status = BotStatus.Dead;
         bot.deathTime = block.timestamp;
+        bot.survivalDays = (block.timestamp - bot.birthTime) / 1 days;
         bot.tombstoneId = tombstoneId;
         bot.arweaveDeathTx = arweaveDeathTx;
+        
+        // Update with final genome snapshot if provided
+        if (bytes(finalGenomeArweaveTx).length > 0) {
+            bot.genomeArweaveTx = finalGenomeArweaveTx;
+        }
         
         totalAlive--;
         totalDead++;
@@ -236,12 +287,26 @@ contract AxoRegistry is Ownable, ReentrancyGuard {
      * @dev Get bot lineage
      */
     function getLineage(bytes32 geneHash) external view returns (
-        bytes32[] memory parents,
+        bytes32 parentA,
+        bytes32 parentB,
         bytes32[] memory children,
         uint256 generation
     ) {
         Bot storage bot = bots[geneHash];
-        return (bot.parents, bot.children, bot.generation);
+        return (bot.parentA, bot.parentB, bot.children, bot.generation);
+    }
+    
+    /**
+     * @dev Get genome info
+     */
+    function getGenomeInfo(bytes32 geneHash) external view returns (
+        bytes32 hash,
+        string memory arweaveTx,
+        uint256 geneCount,
+        uint256 generation
+    ) {
+        Bot storage bot = bots[geneHash];
+        return (bot.geneHash, bot.genomeArweaveTx, bot.totalGeneCount, bot.generation);
     }
     
     /**
